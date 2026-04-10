@@ -68,7 +68,7 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);fo
 .music-btn:hover{border-color:var(--gold);}
 
 /* ── LAYOUT ── */
-.layout{display:grid;grid-template-columns:188px 1fr 230px;gap:0;flex:1;overflow:hidden;}
+.layout{display:grid;grid-template-columns:245px 1fr 210px;gap:0;flex:1;overflow:hidden;}
 .sidebar,.rsidebar,.main{overflow-y:auto;overflow-x:hidden;}
 .sidebar::-webkit-scrollbar,.rsidebar::-webkit-scrollbar,.main::-webkit-scrollbar{width:2px;}
 .sidebar::-webkit-scrollbar-thumb,.rsidebar::-webkit-scrollbar-thumb,.main::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:2px;}
@@ -104,6 +104,24 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);fo
 .psb-medals{display:flex;gap:3px;font-size:16px;}
 .psb-ann{background:rgba(232,41,58,0.1);border-top:1px solid rgba(232,41,58,0.2);padding:6px 10px;text-align:center;font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:2px;color:var(--red2);text-transform:uppercase;animation:glowPulse 2.5s ease-in-out infinite;}
 @keyframes glowPulse{0%,100%{color:var(--red2);}50%{color:#ff8a94;}}
+@keyframes ballSpin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+@keyframes goReveal{
+  0%{opacity:0;transform:scale(0.3) translateY(10px);letter-spacing:1px;}
+  12%{opacity:1;transform:scale(1.12) translateY(-3px);letter-spacing:6px;}
+  22%{opacity:1;transform:scale(1) translateY(0);}
+  75%{opacity:1;transform:scale(1) translateY(0);}
+  92%{opacity:0.15;transform:scale(0.85) translateY(4px);}
+  100%{opacity:0;transform:scale(0.3) translateY(10px);}
+}
+@keyframes canadaReveal{
+  0%{opacity:0;transform:scale(0.25) translateY(14px);letter-spacing:0px;}
+  10%{opacity:0;transform:scale(0.25) translateY(14px);}
+  22%{opacity:1;transform:scale(1.1) translateY(-2px);letter-spacing:5px;}
+  32%{opacity:1;transform:scale(1) translateY(0);letter-spacing:3px;}
+  75%{opacity:1;transform:scale(1) translateY(0);letter-spacing:3px;}
+  92%{opacity:0.12;transform:scale(0.8) translateY(6px);}
+  100%{opacity:0;transform:scale(0.25) translateY(14px);}
+}
 
 /* ── MAIN ── */
 .main{padding:13px;display:flex;flex-direction:column;gap:11px;}
@@ -218,6 +236,35 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);fo
 .lc-announce{padding:7px 12px;background:rgba(232,41,58,0.1);border-top:1px solid rgba(232,41,58,0.2);text-align:center;}
 .lc-announce-txt{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:3px;color:var(--red2);text-transform:uppercase;animation:glowPulse 2s ease-in-out infinite;}
 
+/* ── STADIUM BIG SCREEN ── */
+.bigscreen{border-radius:12px;overflow:hidden;border:2px solid rgba(255,255,255,0.12);position:relative;background:#05060a;flex:1;display:flex;flex-direction:column;min-height:0;}
+.bigscreen::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,rgba(0,0,0,0.18) 0px,rgba(0,0,0,0.18) 1px,transparent 1px,transparent 3px);pointer-events:none;z-index:3;}
+.bs-topbar{display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(0,0,0,0.7);border-bottom:1px solid rgba(255,255,255,0.07);position:relative;z-index:4;flex-shrink:0;}
+.bs-live-dot{width:6px;height:6px;border-radius:50%;background:#E8293A;animation:pulseDot 1.4s infinite;flex-shrink:0;}
+@keyframes pulseDot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(0.7);}}
+.bs-live-txt{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:2px;color:#E8293A;}
+.bs-channel{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.55);text-transform:uppercase;flex:1;}
+.bs-time{font-family:'Bebas Neue',sans-serif;font-size:12px;color:var(--gold);letter-spacing:1px;}
+#bs-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;}
+.bs-content{position:relative;z-index:4;padding:12px 12px 8px;flex:1;display:flex;flex-direction:column;justify-content:center;}
+.bs-category{font-family:'Bebas Neue',sans-serif;font-size:10px;letter-spacing:4px;padding:2px 8px;border-radius:3px;display:inline-block;margin-bottom:7px;width:fit-content;}
+.bs-category.cat-eco{background:rgba(34,197,94,0.2);color:#22C55E;border:1px solid rgba(34,197,94,0.3);}
+.bs-category.cat-ai{background:rgba(124,92,252,0.2);color:#A78BFA;border:1px solid rgba(124,92,252,0.3);}
+.bs-category.cat-edu{background:rgba(41,182,246,0.2);color:#29B6F6;border:1px solid rgba(41,182,246,0.3);}
+.bs-category.cat-life{background:rgba(245,200,66,0.18);color:#F5C842;border:1px solid rgba(245,200,66,0.28);}
+.bs-headline{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1.5px;color:#fff;line-height:1.15;margin-bottom:8px;text-shadow:0 0 20px rgba(255,255,255,0.15);}
+.bs-stat-row{display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.bs-stat{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:4px 9px;text-align:center;flex-shrink:0;}
+.bs-stat-n{font-family:'Bebas Neue',sans-serif;font-size:18px;line-height:1;}
+.bs-stat-l{font-size:8px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);}
+.bs-body{font-size:10px;color:rgba(255,255,255,0.5);line-height:1.55;flex:1;}
+.bs-progress-bar{height:2px;background:rgba(255,255,255,0.06);position:relative;z-index:4;flex-shrink:0;}
+.bs-progress-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--gold));width:0%;transition:width 0.1s linear;}
+.bs-ticker-wrap{display:flex;align-items:center;gap:0;background:rgba(232,41,58,0.85);position:relative;z-index:4;flex-shrink:0;}
+.bs-ticker-label{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:2px;color:#fff;padding:4px 8px;background:var(--red);flex-shrink:0;border-right:1px solid rgba(255,255,255,0.2);}
+.bs-ticker-track{flex:1;overflow:hidden;height:22px;display:flex;align-items:center;}
+.bs-ticker-inner{font-family:'Oswald',sans-serif;font-size:10px;letter-spacing:1px;color:#fff;white-space:nowrap;animation:tickerScroll 28s linear infinite;}
+@keyframes tickerScroll{0%{transform:translateX(100%);}100%{transform:translateX(-100%);}}
 /* ── TOAST & CONFETTI ── */
 .toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(10px);background:#141830;border:1px solid var(--gold);border-radius:8px;padding:8px 18px;font-size:12px;color:var(--gold);font-family:'Oswald',sans-serif;letter-spacing:1px;opacity:0;transition:all 0.3s;pointer-events:none;z-index:200;white-space:nowrap;}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -281,23 +328,26 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);fo
         <div class="sl-row"><div class="sl-l"><div class="sl-dot" style="background:var(--maple)"></div>Goal scored</div><div class="sl-pts">+2 pts</div></div>
         <div class="sl-row"><div class="sl-l"><div class="sl-dot" style="background:var(--gold)"></div>Min 2 shots</div><div class="sl-pts">Entry</div></div>
       </div>
-      <div class="prize-sidebar">
-        <div class="psb-top">
-          <div class="psb-stadium">&#127967;&#65039;</div>
-          <div class="psb-title">London Prize</div>
-          <div class="psb-sub">Capital of Football</div>
+      <!-- CANADA SPOTLIGHT BIG SCREEN -->
+      <div class="bigscreen" id="bigscreen">
+        <div class="bs-topbar">
+          <div class="bs-live-dot"></div>
+          <span class="bs-live-txt">LIVE</span>
+          <span class="bs-channel">&#127464;&#127462; CANADA SPOTLIGHT</span>
+          <span class="bs-time" id="bs-time">--:--</span>
         </div>
-        <div class="psb-body">
-          <div class="psb-perk"><span class="psb-pi">&#9992;&#65039;</span>Return flights included</div>
-          <div class="psb-perk"><span class="psb-pi">&#127941;</span>Live stadium match</div>
-          <div class="psb-perk"><span class="psb-pi">&#127968;</span>GUS HQ visit &amp; team tour</div>
-          <div class="psb-perk"><span class="psb-pi">&#129346;</span>Hosted dinner in London</div>
+        <canvas id="bs-canvas"></canvas>
+        <div class="bs-content">
+          <div class="bs-category" id="bs-category">ECONOMY</div>
+          <div class="bs-headline" id="bs-headline"></div>
+          <div class="bs-stat-row" id="bs-stat-row"></div>
+          <div class="bs-body" id="bs-body"></div>
         </div>
-        <div class="psb-winners">
-          <span class="psb-w-label">Top 3 Winners</span>
-          <span class="psb-medals">&#127865;&#127866;&#127867;</span>
+        <div class="bs-progress-bar"><div class="bs-progress-fill" id="bs-progress-fill"></div></div>
+        <div class="bs-ticker-wrap">
+          <div class="bs-ticker-label">&#127464;&#127462;</div>
+          <div class="bs-ticker-track"><div class="bs-ticker-inner" id="bs-ticker"></div></div>
         </div>
-        <div class="psb-ann">&#128680; Results: July 3rd</div>
       </div>
     </aside>
 
@@ -306,6 +356,25 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);fo
       <div class="hero-card">
         <div class="hero-bg"></div>
         <canvas id="hero-canvas"></canvas>
+        <!-- Stadium poster graphic — bold typographic treatment -->
+        <div style="position:absolute;right:0;top:0;bottom:0;width:220px;z-index:2;pointer-events:none;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <!-- radial glow behind text -->
+          <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 70% 50%,rgba(232,41,58,0.22) 0%,transparent 70%);"></div>
+          <!-- big silhouette number -->
+          <div style="position:absolute;right:-18px;top:50%;transform:translateY(-50%);font-family:'Bebas Neue',Impact,sans-serif;font-size:220px;line-height:1;color:rgba(255,255,255,0.04);letter-spacing:-10px;user-select:none;pointer-events:none;">10</div>
+          <!-- poster content -->
+          <div style="position:relative;z-index:3;text-align:right;padding-right:18px;">
+            <div style="font-family:'Bebas Neue',Impact,sans-serif;font-size:11px;letter-spacing:6px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:6px;">&#127464;&#127462; &nbsp; 2026</div>
+            <!-- football icon -->
+            <div style="font-size:52px;line-height:1;margin-bottom:8px;filter:drop-shadow(0 0 12px rgba(232,41,58,0.6));animation:ballSpin 6s linear infinite;">&#9917;</div>
+            <!-- main slogan — animated pulse every 10s -->
+            <div style="font-family:'Bebas Neue',Impact,sans-serif;font-size:32px;letter-spacing:4px;line-height:0.95;color:#FFFFFF;text-shadow:0 0 30px rgba(232,41,58,0.8);opacity:0;animation:goReveal 10s ease-in-out infinite;">GO</div>
+            <div style="font-family:'Bebas Neue',Impact,sans-serif;font-size:46px;letter-spacing:3px;line-height:0.95;color:#F5C842;text-shadow:0 0 30px rgba(245,200,66,0.6);opacity:0;animation:canadaReveal 10s ease-in-out infinite;">CANADA</div>
+            <div style="font-family:'Bebas Neue',Impact,sans-serif;font-size:20px;letter-spacing:8px;color:rgba(255,255,255,0.7);margin-top:4px;">&#127865; &#127866; &#127867;</div>
+            <!-- divider -->
+            <div style="width:80px;height:2px;background:linear-gradient(90deg,transparent,#E8293A,#F5C842);margin:8px 0 0 auto;border-radius:1px;"></div>
+          </div>
+        </div>
         <div class="hero-content">
           <div>
             <div class="hero-eyebrow">
@@ -366,6 +435,7 @@ body{background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--white);fo
         <div id="podium-wrap"><div style="font-size:11px;color:var(--muted);padding:4px">Add players to see standings</div></div>
       </div>
 
+      <!-- LONDON PRIZE CARD -->
       <div class="london-card">
         <div class="lc-hero">
           <div class="lc-glow"></div>
@@ -416,39 +486,231 @@ var players=[];
 function loadPlayers(){try{var d=localStorage.getItem(SK);if(d)players=JSON.parse(d);}catch(e){players=[];}}
 function savePlayers(){try{localStorage.setItem(SK,JSON.stringify(players));}catch(e){}}
 
-// ── AUDIO: FIFA-STYLE ANTHEM ──
+// ── AUDIO: BRAZIL 2014 FIFA WORLD CUP ANTHEM STYLE ──
 var audioCtx=null,musicPlaying=false,loopTimer=null;
 function createAnthem(ctx){
-  var now=ctx.currentTime;
+  var sr=ctx.sampleRate,now=ctx.currentTime;
+  var totalDur=32.0;
+
+  // ── Signal chain ──
   var master=ctx.createGain();
-  master.gain.setValueAtTime(0,now);master.gain.linearRampToValueAtTime(0.38,now+2.5);master.connect(ctx.destination);
-  var comp=ctx.createDynamicsCompressor();comp.threshold.value=-18;comp.ratio.value=4;comp.connect(master);
-  var rev=ctx.createConvolver();
-  var rl=ctx.sampleRate*3,rb=ctx.createBuffer(2,rl,ctx.sampleRate);
-  for(var c=0;c<2;c++){var rd=rb.getChannelData(c);for(var i=0;i<rl;i++)rd[i]=(Math.random()*2-1)*Math.pow(1-i/rl,1.8);}
-  rev.buffer=rb;rev.connect(master);
-  function note(freq,st,dur,vol,type,dest){
-    var o=ctx.createOscillator(),g=ctx.createGain();
-    o.type=type||'sawtooth';o.frequency.setValueAtTime(freq,now+st);
-    g.gain.setValueAtTime(0,now+st);g.gain.linearRampToValueAtTime(vol,now+st+0.025);
-    g.gain.setValueAtTime(vol,now+st+dur-0.06);g.gain.linearRampToValueAtTime(0,now+st+dur);
-    o.connect(g);g.connect(dest);o.start(now+st);o.stop(now+st+dur+0.08);
+  master.gain.setValueAtTime(0,now);
+  master.gain.linearRampToValueAtTime(0.42,now+3.0);
+  master.gain.setValueAtTime(0.42,now+totalDur-2.5);
+  master.gain.linearRampToValueAtTime(0,now+totalDur);
+  master.connect(ctx.destination);
+
+  var comp=ctx.createDynamicsCompressor();
+  comp.threshold.value=-14;comp.knee.value=6;comp.ratio.value=3;comp.attack.value=0.003;comp.release.value=0.18;
+  comp.connect(master);
+
+  // Stadium reverb — long, warm
+  var revBuf=ctx.createBuffer(2,sr*4,sr);
+  for(var ch=0;ch<2;ch++){var rd=revBuf.getChannelData(ch);for(var i=0;i<rd.length;i++)rd[i]=(Math.random()*2-1)*Math.pow(1-i/rd.length,1.4);}
+  var rev=ctx.createConvolver();rev.buffer=revBuf;
+  var revGain=ctx.createGain();revGain.gain.value=0.55;
+  rev.connect(revGain);revGain.connect(master);
+
+  // Short room reverb for percussion
+  var roomBuf=ctx.createBuffer(2,sr*0.6,sr);
+  for(var ch=0;ch<2;ch++){var rd=roomBuf.getChannelData(ch);for(var i=0;i<rd.length;i++)rd[i]=(Math.random()*2-1)*Math.pow(1-i/rd.length,3);}
+  var room=ctx.createConvolver();room.buffer=roomBuf;
+  var roomGain=ctx.createGain();roomGain.gain.value=0.3;
+  room.connect(roomGain);roomGain.connect(master);
+
+  // ── Helpers ──
+  function brass(freq,st,dur,vol){
+    // Layered sawtooth + square for warm brass timbre
+    [1,2,3].forEach(function(h){
+      var o=ctx.createOscillator(),g=ctx.createGain(),f=ctx.createBiquadFilter();
+      o.type='sawtooth';o.frequency.value=freq*h;
+      f.type='lowpass';f.frequency.value=freq*h<2000?3200:1800;f.Q.value=0.5;
+      var v=vol/(h*1.4);
+      g.gain.setValueAtTime(0,now+st);
+      g.gain.linearRampToValueAtTime(v,now+st+0.04);
+      g.gain.setValueAtTime(v*0.85,now+st+dur*0.6);
+      g.gain.linearRampToValueAtTime(0,now+st+dur);
+      o.connect(f);f.connect(g);g.connect(rev);g.connect(comp);
+      o.start(now+st);o.stop(now+st+dur+0.1);
+    });
   }
-  var mel=[[523.25,0,0.38,0.28],[659.25,0.38,0.38,0.28],[783.99,0.76,0.76,0.35],[880,1.52,0.38,0.3],[987.77,1.90,0.76,0.35],[1046.5,2.66,1.0,0.4],[987.77,3.66,0.3,0.28],[880,3.96,0.3,0.28],[783.99,4.26,0.76,0.32],[659.25,5.02,0.38,0.26],[523.25,5.4,0.38,0.26],[392,5.78,0.76,0.3],[523.25,6.54,0.3,0.24],[659.25,6.84,0.3,0.24],[783.99,7.14,0.38,0.3],[880,7.52,0.38,0.3],[1046.5,7.9,0.88,0.38],[880,8.78,0.38,0.3],[783.99,9.16,0.38,0.3],[659.25,9.54,0.76,0.33],[523.25,10.3,0.28,0.26],[659.25,10.58,0.28,0.26],[880,10.86,0.28,0.3],[1046.5,11.14,0.28,0.33],[1318.5,11.42,1.1,0.42],[1046.5,12.52,0.38,0.34],[880,12.9,0.38,0.3],[783.99,13.28,0.5,0.28],[659.25,13.78,0.38,0.24],[523.25,14.16,1.8,0.32]];
-  mel.forEach(function(n){note(n[0],n[1],n[2],n[3],'sawtooth',rev);});
-  mel.forEach(function(n){note(n[0]*0.5,n[1],n[2],n[3]*0.5,'square',comp);});
-  var harm=[[261.63,0,1.52,0.14,'triangle'],[329.63,0,1.52,0.12,'triangle'],[392,1.52,1.52,0.14,'triangle'],[493.88,1.52,1.52,0.12,'triangle'],[523.25,3.04,2.5,0.14,'triangle'],[392,3.04,2.5,0.12,'triangle'],[261.63,5.54,2.0,0.14,'triangle'],[329.63,5.54,2.0,0.12,'triangle'],[523.25,7.54,2.4,0.15,'triangle'],[659.25,7.54,2.4,0.13,'triangle'],[261.63,9.94,2.0,0.14,'triangle'],[392,9.94,2.0,0.12,'triangle'],[523.25,11.94,4.0,0.15,'triangle'],[659.25,11.94,4.0,0.13,'triangle']];
-  harm.forEach(function(h){note(h[0],h[1],h[2],h[3],h[4],rev);});
-  var bn=[65.41,65.41,82.41,82.41,98,98,65.41,65.41,65.41,65.41,82.41,82.41,98,98,65.41,65.41,65.41,82.41,65.41];
-  bn.forEach(function(f,i){note(f,i*0.8,0.55,0.38,'sawtooth',comp);});
-  function kick(t){var o=ctx.createOscillator(),g=ctx.createGain();o.frequency.setValueAtTime(160,now+t);o.frequency.exponentialRampToValueAtTime(50,now+t+0.12);g.gain.setValueAtTime(0.55,now+t);g.gain.exponentialRampToValueAtTime(0.001,now+t+0.18);o.connect(g);g.connect(comp);o.start(now+t);o.stop(now+t+0.25);}
-  function snare(t){var buf=ctx.createBuffer(1,Math.floor(ctx.sampleRate*0.12),ctx.sampleRate);var dd=buf.getChannelData(0);for(var i=0;i<dd.length;i++)dd[i]=Math.random()*2-1;var src=ctx.createBufferSource(),g=ctx.createGain(),filt=ctx.createBiquadFilter();filt.type='bandpass';filt.frequency.value=1800;filt.Q.value=0.8;src.buffer=buf;src.connect(filt);filt.connect(g);g.gain.setValueAtTime(0.22,now+t);g.gain.exponentialRampToValueAtTime(0.001,now+t+0.12);g.connect(comp);src.start(now+t);}
-  function hat(t){var buf=ctx.createBuffer(1,Math.floor(ctx.sampleRate*0.04),ctx.sampleRate);var dd=buf.getChannelData(0);for(var i=0;i<dd.length;i++)dd[i]=Math.random()*2-1;var src=ctx.createBufferSource(),g=ctx.createGain(),filt=ctx.createBiquadFilter();filt.type='highpass';filt.frequency.value=8000;src.buffer=buf;src.connect(filt);filt.connect(g);g.gain.setValueAtTime(0.07,now+t);g.gain.exponentialRampToValueAtTime(0.001,now+t+0.04);g.connect(comp);src.start(now+t);}
-  var totalDur=16.0;
-  for(var b=0;b<totalDur;b+=0.5){kick(b);if(b%1===0.5)snare(b+0.22);hat(b);hat(b+0.25);}
-  var crowdBuf=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate);var cd=crowdBuf.getChannelData(0);for(var ci=0;ci<cd.length;ci++)cd[ci]=Math.random()*2-1;
-  var crowd=ctx.createBufferSource(),cg=ctx.createGain(),cf=ctx.createBiquadFilter();cf.type='bandpass';cf.frequency.value=600;cf.Q.value=0.3;crowd.buffer=crowdBuf;crowd.loop=true;crowd.connect(cf);cf.connect(cg);cg.connect(master);cg.gain.setValueAtTime(0.05,now);crowd.start(now);crowd.stop(now+totalDur);
-  master.gain.setValueAtTime(0.38,now+totalDur-2);master.gain.linearRampToValueAtTime(0,now+totalDur);
+
+  function strings(freq,st,dur,vol){
+    // Soft triangle + detuned pair for string-like pad
+    [-4,0,4].forEach(function(det){
+      var o=ctx.createOscillator(),g=ctx.createGain();
+      o.type='triangle';o.frequency.value=freq*(1+det*0.0005);
+      g.gain.setValueAtTime(0,now+st);
+      g.gain.linearRampToValueAtTime(vol,now+st+0.18);
+      g.gain.setValueAtTime(vol*0.9,now+st+dur-0.2);
+      g.gain.linearRampToValueAtTime(0,now+st+dur);
+      o.connect(g);g.connect(rev);
+      o.start(now+st);o.stop(now+st+dur+0.1);
+    });
+  }
+
+  function choir(freq,st,dur,vol){
+    // Sine cluster simulating vocal "aah" choir pad
+    [1,1.005,0.995,2,0.5].forEach(function(r,i){
+      var o=ctx.createOscillator(),g=ctx.createGain(),f=ctx.createBiquadFilter();
+      o.type=i<3?'sine':'triangle';o.frequency.value=freq*r;
+      f.type='bandpass';f.frequency.value=freq*r*1.2;f.Q.value=1.8;
+      var v=i<3?vol*0.18:vol*0.06;
+      g.gain.setValueAtTime(0,now+st);
+      g.gain.linearRampToValueAtTime(v,now+st+0.35);
+      g.gain.setValueAtTime(v,now+st+dur-0.4);
+      g.gain.linearRampToValueAtTime(0,now+st+dur);
+      o.connect(f);f.connect(g);g.connect(rev);
+      o.start(now+st);o.stop(now+st+dur+0.1);
+    });
+  }
+
+  function bass(freq,st,dur,vol){
+    var o=ctx.createOscillator(),g=ctx.createGain(),f=ctx.createBiquadFilter();
+    o.type='sawtooth';o.frequency.value=freq;
+    f.type='lowpass';f.frequency.value=280;f.Q.value=0.7;
+    g.gain.setValueAtTime(0,now+st);
+    g.gain.linearRampToValueAtTime(vol,now+st+0.03);
+    g.gain.setValueAtTime(vol*0.7,now+st+dur-0.05);
+    g.gain.linearRampToValueAtTime(0,now+st+dur);
+    o.connect(f);f.connect(g);g.connect(comp);
+    o.start(now+st);o.stop(now+st+dur+0.05);
+  }
+
+  function kick(t){
+    var o=ctx.createOscillator(),g=ctx.createGain();
+    o.frequency.setValueAtTime(180,now+t);
+    o.frequency.exponentialRampToValueAtTime(42,now+t+0.18);
+    g.gain.setValueAtTime(0.7,now+t);
+    g.gain.exponentialRampToValueAtTime(0.001,now+t+0.22);
+    o.connect(g);g.connect(comp);g.connect(room);
+    o.start(now+t);o.stop(now+t+0.3);
+  }
+
+  function snare(t){
+    var buf=ctx.createBuffer(1,Math.floor(sr*0.15),sr);
+    var d=buf.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1);
+    var src=ctx.createBufferSource(),g=ctx.createGain();
+    var bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=2200;bp.Q.value=0.6;
+    src.buffer=buf;src.connect(bp);bp.connect(g);
+    g.gain.setValueAtTime(0.28,now+t);
+    g.gain.exponentialRampToValueAtTime(0.001,now+t+0.15);
+    g.connect(comp);g.connect(room);src.start(now+t);
+  }
+
+  function timbal(t,v){
+    // Brazilian samba timbal drum hit
+    var o=ctx.createOscillator(),g=ctx.createGain();
+    o.frequency.setValueAtTime(320,now+t);
+    o.frequency.exponentialRampToValueAtTime(180,now+t+0.06);
+    g.gain.setValueAtTime(v||0.35,now+t);
+    g.gain.exponentialRampToValueAtTime(0.001,now+t+0.12);
+    o.connect(g);g.connect(comp);g.connect(room);
+    o.start(now+t);o.stop(now+t+0.18);
+  }
+
+  function clave(t){
+    // High woodblock click — iconic samba clave
+    var buf=ctx.createBuffer(1,Math.floor(sr*0.05),sr);
+    var d=buf.getChannelData(0);
+    for(var i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,4);
+    var src=ctx.createBufferSource(),g=ctx.createGain(),hp=ctx.createBiquadFilter();
+    hp.type='highpass';hp.frequency.value=4000;
+    src.buffer=buf;src.connect(hp);hp.connect(g);
+    g.gain.setValueAtTime(0.18,now+t);
+    g.gain.exponentialRampToValueAtTime(0.001,now+t+0.05);
+    g.connect(comp);src.start(now+t);
+  }
+
+  // ── SECTION A: Intro fanfare — iconic 5-note brass call (0–4s) ──
+  // The famous "dun-dun-dun-dun-DUUUN" opening
+  var T=0; // tempo: crotchet = 0.5s (120bpm)
+  brass(392,T+0.0,0.22,0.32);   // G
+  brass(392,T+0.25,0.22,0.32);  // G
+  brass(523.25,T+0.5,0.22,0.36);// C5
+  brass(392,T+0.75,0.22,0.32);  // G
+  brass(659.25,T+1.1,1.1,0.42); // E5 — the long note
+  brass(587.33,T+2.3,0.22,0.32);// D5
+  brass(523.25,T+2.6,0.22,0.32);// C5
+  brass(392,T+2.9,1.1,0.38);    // G — settle
+
+  // Choir swells under the fanfare
+  choir(261.63,T+0.0,4.0,0.5);  // C chord
+  choir(329.63,T+0.0,4.0,0.4);
+  choir(392,T+0.0,4.0,0.4);
+
+  // ── SECTION B: Main theme — soaring melody (4–12s) ──
+  T=4.0;
+  // Melody — the uplifting phrase
+  var mel2=[
+    [523.25,0,0.45],[659.25,0.5,0.45],[783.99,1.0,0.45],[880,1.5,0.9],
+    [783.99,2.5,0.45],[659.25,3.0,0.45],[783.99,3.5,0.9],
+    [659.25,4.5,0.45],[587.33,5.0,0.45],[523.25,5.5,0.45],[587.33,6.0,0.45],[659.25,6.5,0.9],
+    [523.25,7.5,0.45]
+  ];
+  mel2.forEach(function(n){brass(n[0],T+n[1],n[2],0.28);});
+  mel2.forEach(function(n){strings(n[0]*0.5,T+n[1],n[2]+0.1,0.14);});
+
+  // Choir pads — warm harmonic bed
+  choir(261.63,T+0,2.0,0.55);choir(329.63,T+0,2.0,0.45);choir(392,T+0,2.0,0.45);
+  choir(349.23,T+2,2.0,0.5);choir(440,T+2,2.0,0.42);choir(523.25,T+2,2.0,0.38);
+  choir(261.63,T+4,2.0,0.55);choir(329.63,T+4,2.0,0.45);choir(523.25,T+4,2.0,0.4);
+  choir(220,T+6,2.0,0.5);choir(277.18,T+6,2.0,0.42);choir(329.63,T+6,2.0,0.42);
+
+  // Bass line
+  bass(65.41,T+0,1.9,0.42);bass(87.31,T+2,1.9,0.42);bass(65.41,T+4,1.9,0.42);bass(55,T+6,1.9,0.42);
+
+  // ── SECTION C: Brazilian samba percussion kicks in (8s+) ──
+  T=8.0;
+  for(var b=0;b<24;b+=1){
+    kick(T+b*0.5);
+    if(b%2===1) snare(T+b*0.5+0.25);
+    timbal(T+b*0.5+0.12,0.22);
+    clave(T+b*0.5);
+    clave(T+b*0.5+0.32);
+  }
+
+  // ── SECTION D: Climax — full ensemble (12–24s) ──
+  T=12.0;
+  var climax=[
+    [523.25,0,0.45],[659.25,0.5,0.45],[880,1.0,0.45],[1046.5,1.5,0.9],
+    [880,2.5,0.45],[783.99,3.0,0.45],[880,3.5,0.9],
+    [1046.5,4.5,0.45],[987.77,5.0,0.45],[880,5.5,0.45],[783.99,6.0,0.45],[659.25,6.5,0.9],
+    [783.99,7.5,0.45],[880,8.0,0.45],[1046.5,8.5,0.45],[1318.5,9.0,1.5]
+  ];
+  climax.forEach(function(n){brass(n[0],T+n[1],n[2],0.34);});
+  climax.forEach(function(n){strings(n[0]*0.5,T+n[1],n[2]+0.15,0.18);});
+  climax.forEach(function(n){choir(n[0]*0.25,T+n[1],n[2]+0.2,0.55);});
+
+  // Big bass line in climax
+  bass(65.41,T+0,1.9,0.5);bass(87.31,T+2,1.9,0.5);bass(65.41,T+4,1.9,0.5);
+  bass(55,T+6,1.9,0.5);bass(65.41,T+8,1.9,0.5);bass(87.31,T+10,1.9,0.5);
+
+  // Full samba percussion through climax
+  for(var b=0;b<24;b+=1){
+    kick(T+b*0.5);
+    if(b%2===1) snare(T+b*0.5+0.25);
+    timbal(T+b*0.5+0.12,0.28);
+    clave(T+b*0.5);
+    clave(T+b*0.5+0.32);
+  }
+
+  // ── SECTION E: Resolution — gentle fade (24–32s) ──
+  T=24.0;
+  brass(523.25,T+0,1.8,0.24);brass(659.25,T+2,1.8,0.22);brass(783.99,T+4,2.4,0.2);
+  choir(261.63,T+0,4.0,0.4);choir(329.63,T+0,4.0,0.32);choir(392,T+0,4.0,0.3);
+  choir(261.63,T+4,3.5,0.35);choir(329.63,T+4,3.5,0.28);choir(523.25,T+4,3.5,0.25);
+  strings(261.63,T+0,8.0,0.12);strings(329.63,T+0,8.0,0.1);
+  bass(65.41,T+0,1.9,0.3);bass(65.41,T+4,3.5,0.2);
+
+  // Soft kick pattern fading out
+  for(var b=0;b<12;b+=1){
+    var fv=1-b/12;
+    kick(T+b*0.5);
+    if(b%2===1) snare(T+b*0.5+0.25);
+    clave(T+b*0.5);
+  }
+
   return totalDur;
 }
 function playMusic(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();var dur=createAnthem(audioCtx);loopTimer=setTimeout(function(){if(musicPlaying)playMusic();},(dur-0.3)*1000);}
@@ -539,6 +801,7 @@ function startApp(){
   musicPlaying=true;setTimeout(function(){playMusic();},600);
   loadPlayers();renderAll();
   setInterval(updateCountdown,1000);updateCountdown();
+  setTimeout(initBigScreen,800);
 }
 
 // ── DATA & RENDER ──
@@ -580,7 +843,7 @@ function renderTable(){
   var qF=allS.filter(function(p){return applyFilter(p)&&mq(p);});
   var uF=unq.filter(function(p){return applyFilter(p)&&mq(p);});
   var tbody=document.getElementById('tbl-body');
-  if(!qF.length&&!uF.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;padding:26px;color:var(--muted);font-size:12px">No players found</td></tr>';return;}
+  if(!qF.length&&!uF.length){tbody.innerHTML='<tr><td colspan="7"><div style="text-align:center;padding:32px 20px;"><div style="font-size:28px;margin-bottom:10px;">&#9917;</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:18px;letter-spacing:3px;color:var(--gold);margin-bottom:6px;">LEADERBOARD GOES LIVE MAY 1ST</div><div style="font-size:11px;color:var(--muted);letter-spacing:1px;">The official player standings will be published here on 1st May 2026.<br>Stay tuned &mdash; the race to London is about to begin.</div></div></td></tr>';return;}
   var html=qF.map(function(p){
     var score=pts(p),pct=Math.round((score/Math.max(maxP,1))*100);
     var ri=allS.indexOf(p),rc=ri<3?rowC[ri]:'',rkd=ri<3?medals[ri]:(ri+1);
@@ -600,8 +863,83 @@ function updateStats(){
   document.getElementById('h-goals').textContent=players.reduce(function(s,p){return s+p.goals;},0);
   document.getElementById('h-pts').textContent=players.reduce(function(s,p){return s+pts(p);},0);
 }
-
 function renderAll(){renderPodium();renderNations();renderTable();updateStats();}
+
+// ── STADIUM BIG SCREEN ──
+var bsSlides=[
+  {cat:'cat-ai',catLabel:'AI',headline:'BIRTHPLACE OF\nDEEP LEARNING',stats:[{n:'Mila',l:'World\'s Largest AI Lab'},{n:'3',l:'Turing Award Winners'},{n:'#3',l:'Global AI Talent'},{n:'1980s',l:'Deep Learning Born Here'}],body:'Geoffrey Hinton, Yoshua Bengio and Yann LeCun — the "Godfathers of AI" — built the foundations of modern deep learning at Canadian universities. Montreal\'s Mila institute remains the world\'s largest academic AI research centre.',ticker:'Yoshua Bengio\'s Mila institute employs 900+ AI researchers  &#183;  Geoffrey Hinton won 2024 Nobel Prize in Physics for AI work  &#183;  Toronto Vector Institute home to 700+ AI specialists'},
+  {cat:'cat-eco',catLabel:'ECONOMY',headline:'G7 ECONOMY.\nAAA CREDIT.\nROCK SOLID.',stats:[{n:'$2.14T',l:'GDP (2024)'},{n:'AAA',l:'S&P Credit Rating'},{n:'Top 10',l:'Global Trading Nation'},{n:'50+ Yrs',l:'Trade Surplus History'}],body:'Canada holds one of only a handful of AAA credit ratings globally, reflecting exceptional fiscal management. The economy is underpinned by vast natural resources, a world-class financial sector and deep trade ties across 51 countries through CETA and CUSMA.',ticker:'Canada-EU trade deal (CETA) covers 800M consumers  &#183;  Toronto Stock Exchange ranked top 10 globally by market cap  &#183;  Bank of Canada among world\'s most stable central banks'},
+  {cat:'cat-ai',catLabel:'TECH',headline:'$40 BILLION\nTECH ECOSYSTEM',stats:[{n:'$40B+',l:'VC Investment 2019-24'},{n:'15,000+',l:'Tech Companies'},{n:'#5',l:'Global Startup Hub'},{n:'Shopify',l:'$100B+ Canadian Tech Co'}],body:'Canada is home to a thriving technology ecosystem stretching from Vancouver to Montreal. Shopify, OpenText, Coveo and hundreds of scale-ups are headquartered here. The Toronto-Waterloo tech corridor is now one of the fastest-growing in North America.',ticker:'Shopify processes $235B in merchant sales annually  &#183;  Toronto ranked #2 in North America for tech job growth  &#183;  Waterloo Region produces more engineering graduates per capita than Silicon Valley'},
+  {cat:'cat-life',catLabel:'INNOVATION',headline:'WORLD\'S MOST\nLIVEABLE CITIES',stats:[{n:'#1',l:'Vancouver — EIU 2024'},{n:'#3',l:'Calgary — EIU 2024'},{n:'#5',l:'Toronto — Mercer 2024'},{n:'Top 5',l:'Montreal Quality of Life'}],body:'Four Canadian cities rank in the global top 10 for liveability, safety and infrastructure — measured annually by the Economist Intelligence Unit and Mercer. Canada consistently scores highest in healthcare quality, environmental standards and urban safety.',ticker:'Vancouver ranked world\'s most liveable city 2024 (EIU)  &#183;  Calgary & Calgary both top 3 globally  &#183;  Canada scores 9.1/10 for urban safety index'},
+  {cat:'cat-eco',catLabel:'CLEAN ENERGY',headline:'83% OF CANADA\'S\nPOWER IS CLEAN',stats:[{n:'83%',l:'Renewable Electricity'},{n:'#1',l:'Hydro Power Per Capita'},{n:'$15B',l:'Clean Tech Investment'},{n:'2050',l:'Net Zero Target'}],body:'Canada generates 83% of its electricity from renewable sources — primarily hydroelectric — making it one of the cleanest power grids on earth. This clean energy advantage is attracting major data centre and semiconductor investments requiring low-carbon power.',ticker:'Quebec offers cheapest & cleanest electricity in North America  &#183;  Canada home to 7 of world\'s 20 largest hydroelectric dams  &#183;  Microsoft, Google & Amazon building major Canadian data centres'},
+  {cat:'cat-ai',catLabel:'RESEARCH',headline:'CANADA INVESTS\nIN THE FUTURE',stats:[{n:'$3.1B',l:'Pan-Canadian AI Strategy'},{n:'200+',l:'Research Institutions'},{n:'#6',l:'Global R&D Spend'},{n:'NSERC',l:'Since 1978'}],body:'The Canadian government has committed over $3 billion to its national AI strategy — funding three world-class institutes: Mila in Montreal, Vector in Toronto, and Amii in Edmonton. This makes Canada one of the few nations with a coordinated, fully-funded national AI plan.',ticker:'Canada\'s Pan-Canadian AI Strategy renewed with $2.4B in 2024  &#183;  Vector Institute graduates 500+ AI specialists annually  &#183;  Canadian AI research cited more per paper than global average'}
+];
+
+var bsCurrent=0,bsProgress=0,bsDuration=7000,bsInterval=null,bsProgressInterval=null;
+
+function bsRenderSlide(idx,animate){
+  var s=bsSlides[idx];
+  var cat=document.getElementById('bs-category');
+  var hl=document.getElementById('bs-headline');
+  var sr=document.getElementById('bs-stat-row');
+  var bd=document.getElementById('bs-body');
+  cat.className='bs-category '+s.cat;cat.textContent=s.catLabel;
+  hl.innerHTML=s.headline.replace(/\n/g,'<br>');
+  sr.innerHTML=s.stats.map(function(st){return'<div class="bs-stat"><div class="bs-stat-n" style="color:'+({cat_eco:'#22C55E',cat_ai:'#A78BFA',cat_edu:'#29B6F6',cat_life:'#F5C842'}[s.cat.replace('-','_')]||'#F5C842')+'">'+st.n+'</div><div class="bs-stat-l">'+st.l+'</div></div>';}).join('');
+  bd.textContent=s.body;
+  if(animate){cat.style.opacity='0';hl.style.opacity='0';sr.style.opacity='0';bd.style.opacity='0';setTimeout(function(){[cat,hl,sr,bd].forEach(function(el,i){setTimeout(function(){el.style.transition='opacity 0.5s ease';el.style.opacity='1';},i*80);});},30);}
+  document.getElementById('bs-ticker').innerHTML=s.ticker+'&nbsp;&nbsp;&nbsp;&nbsp;&bull;&nbsp;&nbsp;&nbsp;&nbsp;'+bsSlides[(idx+1)%bsSlides.length].ticker;
+}
+
+function bsColorForCat(cat){
+  var m={cat_eco:'#22C55E',cat_ai:'#A78BFA',cat_edu:'#29B6F6',cat_life:'#F5C842'};
+  return m[cat.replace('-','_')]||'#F5C842';
+}
+
+function bsStartCycle(){
+  bsProgress=0;document.getElementById('bs-progress-fill').style.width='0%';
+  if(bsProgressInterval)clearInterval(bsProgressInterval);
+  bsProgressInterval=setInterval(function(){
+    bsProgress+=100/(bsDuration/100);
+    if(bsProgress>100)bsProgress=100;
+    document.getElementById('bs-progress-fill').style.width=bsProgress+'%';
+  },100);
+  if(bsInterval)clearTimeout(bsInterval);
+  bsInterval=setTimeout(function(){bsCurrent=(bsCurrent+1)%bsSlides.length;bsRenderSlide(bsCurrent,true);bsStartCycle();},bsDuration);
+}
+
+function bsUpdateClock(){
+  var now=new Date();
+  var h=String(now.getHours()).padStart(2,'0'),m=String(now.getMinutes()).padStart(2,'0'),s=String(now.getSeconds()).padStart(2,'0');
+  var el=document.getElementById('bs-time');if(el)el.textContent=h+':'+m+':'+s;
+}
+
+// Big screen background canvas — subtle animated glow
+(function(){
+  var c=document.getElementById('bs-canvas'),ctx=c.getContext('2d');
+  function rz(){var r=c.parentElement.getBoundingClientRect();c.width=r.width||206;c.height=r.height||300;}
+  setTimeout(rz,200);window.addEventListener('resize',rz);
+  function anim(){
+    if(!c.width){requestAnimationFrame(anim);return;}
+    ctx.clearRect(0,0,c.width,c.height);
+    var t=Date.now()/3000;
+    // subtle flag-colour atmospheric glow
+    var spots=[[0.15+Math.sin(t)*0.08,0.3,'rgba(232,41,58,0.07)'],[0.85+Math.cos(t*0.9)*0.07,0.5,'rgba(232,41,58,0.05)'],[0.5,0.2+Math.sin(t*0.7)*0.1,'rgba(245,200,66,0.04)']];
+    spots.forEach(function(s){var g=ctx.createRadialGradient(c.width*s[0],c.height*s[1],0,c.width*s[0],c.height*s[1],c.width*0.55);g.addColorStop(0,s[2]);g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,c.width,c.height);});
+    // faint maple watermark
+    ctx.save();ctx.globalAlpha=0.04;ctx.font='120px serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#E8293A';ctx.fillText('\uD83C\uDF41',c.width/2,c.height/2);ctx.restore();
+    requestAnimationFrame(anim);
+  }
+  anim();
+})();
+
+function initBigScreen(){
+  bsRenderSlide(0,false);
+  bsStartCycle();
+  setInterval(bsUpdateClock,1000);
+  bsUpdateClock();
+}
+
 
 function updateCountdown(){
   var end=new Date('2026-06-30T23:59:59');
