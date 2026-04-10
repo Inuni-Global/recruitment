@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GUS Canada · Win Your London Adventure</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#f0eaf8;display:flex;justify-content:center;padding:32px 16px;min-height:100vh;font-family:'DM Sans',sans-serif}
+  .fl{background:#fff;color:#1a1a2e;font-family:'DM Sans',sans-serif;max-width:600px;width:100%;margin:0 auto;border-radius:20px;overflow:hidden;border:2px solid #e0d4f8}
+  .hero{background:#2d1b69;position:relative;overflow:hidden}
+  .pitch-top{background:#1a7a3c;padding:10px 32px;display:flex;align-items:center;justify-content:space-between}
+  .pitch-lines{display:flex;gap:3px;align-items:center}
+  .pl{width:18px;height:3px;background:rgba(255,255,255,0.35);border-radius:2px}
+  .pitch-mid{font-size:11px;font-weight:500;color:rgba(255,255,255,0.6);letter-spacing:0.08em;text-transform:uppercase}
+  .pitch-flags{display:flex;gap:8px;align-items:center;font-size:20px}
+  .hero-inner{padding:28px 32px 30px;position:relative;overflow:hidden}
+  .ball-bg{position:absolute;right:-30px;top:10px;opacity:0.08;font-size:180px;line-height:1;pointer-events:none;transform:rotate(15deg)}
+  .maple-bg{position:absolute;left:-20px;bottom:-10px;opacity:0.07;font-size:140px;line-height:1;pointer-events:none}
+  .excl-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(255,210,63,0.22);border:1.5px solid rgba(255,210,63,0.7);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:500;color:#ffd23f;letter-spacing:0.03em;margin-bottom:18px;position:relative;z-index:1}
+  .dot{width:7px;height:7px;border-radius:50%;background:#ffd23f;flex-shrink:0}
+  .hl{font-family:'Bebas Neue','Impact',sans-serif;font-size:64px;line-height:0.88;letter-spacing:1px;color:#fff;position:relative;z-index:1}
+  .hl .ac{color:#ffd23f}
+  .sub{font-size:14px;color:rgba(255,255,255,0.72);line-height:1.6;margin-top:12px;position:relative;z-index:1}
+  .badge-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;position:relative;z-index:1}
+  .stbadge{display:inline-flex;align-items:center;gap:7px;background:#e8401a;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:500;color:#fff}
+  .stbadge2{display:inline-flex;align-items:center;gap:7px;background:#1a7a3c;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:500;color:#fff}
+  .sticon{font-size:16px;animation:pb 2.5s ease-in-out infinite}
+  @keyframes pb{0%,100%{transform:scale(1)}50%{transform:scale(1.22)}}
+  .scoreboard{background:#1a7a3c;padding:12px 32px;display:flex;align-items:center;justify-content:space-between}
+  .sc-left{display:flex;align-items:center;gap:10px}
+  .sc-logo{font-size:22px}
+  .sc-title{font-size:12px;font-weight:500;color:#fff;line-height:1.3}
+  .sc-sub{font-size:10px;color:rgba(255,255,255,0.6)}
+  .sc-right{display:flex;align-items:center;gap:6px}
+  .sc-score{background:rgba(255,255,255,0.15);border-radius:6px;padding:4px 10px;font-family:'Bebas Neue',sans-serif;font-size:22px;color:#ffd23f;letter-spacing:2px}
+  .podium{background:#f9f5ff;padding:22px 32px}
+  .slbl{font-size:10px;font-weight:500;letter-spacing:0.13em;color:#9b8ac4;text-transform:uppercase;margin-bottom:14px}
+  .wgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .wc{border-radius:14px;padding:15px 10px;text-align:center}
+  .wc.g{background:#fff9e0;border:2px solid #ffd23f}
+  .wc.s{background:#f0f4ff;border:2px solid #a0b4f0}
+  .wc.b{background:#fff2ec;border:2px solid #ffaa80}
+  .med{font-size:26px;display:block;margin-bottom:5px}
+  .plbl{font-size:11px;font-weight:500;letter-spacing:0.06em;margin-bottom:3px}
+  .g .plbl{color:#a07800}.s .plbl{color:#2a4690}.b .plbl{color:#a04010}
+  .pdesc{font-size:11px;color:#7a6f8a;line-height:1.4}
+  .fnote{font-size:11px;color:#9b8ac4;margin-top:10px;line-height:1.5}
+  .pitch-divider{background:#1a7a3c;padding:8px 32px;display:flex;align-items:center;gap:6px}
+  .pd-line{flex:1;height:1px;background:rgba(255,255,255,0.25)}
+  .pd-icon{font-size:18px}
+  .pd-text{font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.6)}
+  .howsec{background:#fff;padding:20px 32px}
+  .hgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .hitem{background:#f5f0ff;border:1.5px solid #e0d4f8;border-radius:12px;padding:13px 14px}
+  .htitle{font-size:12px;font-weight:500;color:#2d1b69;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+  .hico{font-size:16px}
+  .hbody{font-size:11px;color:#7a6f8a;line-height:1.45}
+  .qualify{background:#fff8f0;padding:20px 32px;border-top:1.5px solid #ffe5cc}
+  .qtag{display:inline-flex;align-items:center;gap:6px;background:#e8401a;border-radius:6px;padding:5px 12px;font-size:11px;color:#fff;font-weight:500;margin-bottom:14px}
+  .qrow{display:flex;align-items:flex-start;gap:10px;margin-bottom:9px}
+  .qrow:last-child{margin-bottom:0}
+  .qnum{width:23px;height:23px;border-radius:50%;background:#e8401a;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#fff;margin-top:1px}
+  .qtext{font-size:12px;color:#5a4a3a;line-height:1.55}
+  .qtext strong{color:#2d1b69;font-weight:500}
+  .regsec{background:#f0f8ff;padding:20px 32px;border-top:1.5px solid #d0e8ff}
+  .regsteps{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .rstep{display:flex;align-items:flex-start;gap:10px}
+  .rarrow{font-size:14px;color:#3b82f6;margin-top:1px;flex-shrink:0}
+  .rtext{font-size:12px;color:#4a5568;line-height:1.5}
+  .rtext strong{color:#1e3a8a;font-weight:500}
+  .rtext a{color:#3b82f6;text-decoration:none}
+  .regfields{background:#fff;border:1.5px solid #bfdbfe;border-radius:10px;padding:12px 14px;margin-top:12px}
+  .rfrow{display:flex;flex-wrap:wrap;gap:7px 18px}
+  .rftag{font-size:11px;color:#4a5568;display:flex;align-items:center;gap:5px}
+  .rfdot{width:5px;height:5px;border-radius:50%;background:#ffd23f;flex-shrink:0}
+  .datebar{background:#2d1b69;padding:18px 32px;display:grid;grid-template-columns:1fr 1fr;gap:0;position:relative;overflow:hidden}
+  .datebar::before{content:'⚽';position:absolute;right:16px;top:50%;transform:translateY(-50%) rotate(20deg);font-size:56px;opacity:0.08;pointer-events:none}
+  .ditem{text-align:center;padding:2px 0}
+  .ditem:first-child{border-right:1px solid rgba(255,255,255,0.2)}
+  .dlbl{font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:4px}
+  .dval{font-family:'Bebas Neue','Impact',sans-serif;font-size:27px;letter-spacing:1px;color:#ffd23f;line-height:1}
+  .lboard{background:#fff;padding:13px 32px;border-top:1.5px solid #e8f5e9;display:flex;align-items:center;gap:10px}
+  .lbtxt{font-size:12px;color:#7a6f8a;line-height:1.5}
+  .lbtxt strong{color:#1a7a3c;font-weight:500}
+  .lbtxt a{color:#3b82f6;font-size:11px}
+  .footer-strip{background:#e8401a;padding:10px 32px;display:flex;align-items:center;justify-content:center;gap:16px}
+  .fs-flag{font-size:22px}
+  .fs-sep{font-size:16px;color:rgba(255,255,255,0.4)}
+  .fs-text{font-size:11px;font-weight:500;color:rgba(255,255,255,0.85);letter-spacing:0.06em;text-transform:uppercase}
+  .disc{background:#fafafa;padding:14px 32px;border-top:1.5px solid #f0f0f0}
+  .dtxt{font-size:10px;color:#aaa;line-height:1.6}
+  .dtxt strong{color:#888;font-weight:500}
+</style>
+</head>
+<body>
+<div class="fl">
+
+  <div class="hero">
+    <div class="pitch-top">
+      <div class="pitch-lines"><div class="pl"></div><div class="pl"></div><div class="pl"></div><div class="pl"></div><div class="pl"></div></div>
+      <div class="pitch-mid">⚽ GUS Canada Fantasy Recruitment League ⚽</div>
+      <div class="pitch-flags"><span style="font-size:18px">🇨🇦</span><span style="font-size:18px">🇬🇧</span></div>
+    </div>
+    <div class="hero-inner">
+      <div class="ball-bg">⚽</div>
+      <div class="maple-bg">🍁</div>
+      <div class="excl-badge"><span class="dot"></span>GUS Canada UNF &amp; UCW Brand Ambassadors only</div>
+      <div class="hl">WIN YOUR<br><span class="ac">LONDON</span><br>ADVENTURE</div>
+      <p class="sub">Top 3 players in the GUS Canada fantasy recruitment league<br>win a return trip to London for a live stadium experience.</p>
+      <div class="badge-row">
+        <div class="stbadge"><span class="sticon">🏟</span>Live stadium match · London</div>
+        <div class="stbadge2"><span style="font-size:16px">🍁</span>Canada × UK</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scoreboard">
+    <div class="sc-left">
+      <div class="sc-logo">📋</div>
+      <div>
+        <div class="sc-title">Live scoreboard</div>
+        <div class="sc-sub">Updated every day</div>
+      </div>
+    </div>
+    <div class="sc-right">
+      <span style="font-size:18px">🇨🇦</span>
+      <div class="sc-score">VS</div>
+      <span style="font-size:18px">🇬🇧</span>
+    </div>
+  </div>
+
+  <div class="podium">
+    <div class="slbl">3 winners · all fly to London</div>
+    <div class="wgrid">
+      <div class="wc g"><span class="med">🥇</span><div class="plbl">1st place</div><div class="pdesc">Return flights + VIP stadium experience</div></div>
+      <div class="wc s"><span class="med">🥈</span><div class="plbl">2nd place</div><div class="pdesc">Return flights + live matchday seats</div></div>
+      <div class="wc b"><span class="med">🥉</span><div class="plbl">3rd place</div><div class="pdesc">Return flights + stadium tour</div></div>
+    </div>
+    <p class="fnote">✈️ Return flights from your nearest international airport · 🏨 Accommodation included</p>
+  </div>
+
+  <div class="pitch-divider">
+    <div class="pd-line"></div>
+    <span class="pd-icon">⚽</span>
+    <div class="pd-text">How the game works</div>
+    <span class="pd-icon">⚽</span>
+    <div class="pd-line"></div>
+  </div>
+
+  <div class="howsec">
+    <div class="hgrid">
+      <div class="hitem"><div class="htitle"><span class="hico">👟</span>Shot = 1 point</div><div class="hbody">Every application to UCW or UNF counts as a shot on goal</div></div>
+      <div class="hitem"><div class="htitle"><span class="hico">🥅</span>Goal = 1 point</div><div class="hbody">Every confirmed payment scores — goals and shots are equal</div></div>
+      <div class="hitem"><div class="htitle"><span class="hico">📊</span>Daily resets</div><div class="hbody">Dashboard and rankings refresh every single day</div></div>
+      <div class="hitem"><div class="htitle"><span class="hico">🏫</span>UCW &amp; UNF only</div><div class="hbody">Only GUS Canada university submissions count toward your score</div></div>
+    </div>
+  </div>
+
+  <div class="qualify">
+    <div class="qtag"><span style="font-size:13px">📋</span> Qualification requirement</div>
+    <div class="qrow"><div class="qnum">1</div><div class="qtext">Submit <strong>at least 2 applications</strong> to GUS Canada universities (UCW or UNF) to qualify for a prize</div></div>
+    <div class="qrow"><div class="qnum">2</div><div class="qtext">Open to <strong>registered GUS Canada UNF &amp; UCW Brand Ambassadors</strong> only</div></div>
+    <div class="qrow"><div class="qnum">3</div><div class="qtext"><strong>Register before submitting</strong> — retroactive entries are not accepted</div></div>
+  </div>
+
+  <div class="regsec">
+    <div class="slbl">🎽 How to register</div>
+    <div class="regsteps">
+      <div class="rstep"><div class="rarrow">▸</div><div class="rtext">Speak to any <strong>GUS Canada account manager</strong></div></div>
+      <div class="rstep"><div class="rarrow">▸</div><div class="rtext">Or email <strong><a href="mailto:partnerhub.ca@gus.global">partnerhub.ca@gus.global</a></strong></div></div>
+    </div>
+    <div class="regfields">
+      <div class="slbl" style="margin-bottom:8px">Include in your registration</div>
+      <div class="rfrow">
+        <div class="rftag"><span class="rfdot"></span>Full name</div>
+        <div class="rftag"><span class="rfdot"></span>Agency you represent</div>
+        <div class="rftag"><span class="rfdot"></span>Country you play for</div>
+        <div class="rftag"><span class="rfdot"></span>Your nickname (for the scoreboard)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="datebar">
+    <div class="ditem"><div class="dlbl">⏱ Entry deadline</div><div class="dval">June 30, 2026</div></div>
+    <div class="ditem"><div class="dlbl">🏆 Winners announced</div><div class="dval">July 3, 2026</div></div>
+  </div>
+
+  <div class="lboard">
+    <span style="font-size:22px">📈</span>
+    <div class="lbtxt"><strong>Live scoreboard — updated daily</strong><br><a href="https://thebdlab.github.io/recruitment/RankFlow.html" target="_blank">thebdlab.github.io/recruitment/RankFlow.html</a></div>
+  </div>
+
+  <div class="footer-strip">
+    <span class="fs-flag">🇨🇦</span>
+    <span class="fs-sep">⚽</span>
+    <span class="fs-text">GUS Canada · UCW · UNF</span>
+    <span class="fs-sep">⚽</span>
+    <span class="fs-flag">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
+  </div>
+
+  <div class="disc">
+    <div class="dtxt"><strong>Privacy &amp; data notice:</strong> By registering, you consent to GUS Canada storing and processing your name, agency, country, and chosen nickname solely for the purpose of administering this competition and displaying your nickname on the public scoreboard. Your personal data will not be shared with third parties or used for any other purpose. You may request removal at any time by contacting partnerhub.ca@gus.global.</div>
+    <div class="dtxt" style="margin-top:8px"><strong>No monetary exchange:</strong> This is a non-cash incentive programme. The prize is a sponsored travel experience with no cash equivalent or transferable monetary value. This competition is not a lottery, raffle, or gambling activity. GUS Canada reserves the right to amend or withdraw the competition at any time. Participation constitutes acceptance of these terms.</div>
+  </div>
+
+</div>
+</body>
+</html>
