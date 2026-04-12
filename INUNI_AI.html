@@ -1,0 +1,1225 @@
+import { useState, useEffect, useRef } from "react";
+
+const UNIVERSITIES_WESTERN = [
+  { id: "arden", name: "Arden University", country: "UK", logo: "🎓" },
+  { id: "ulaw", name: "The University of Law", country: "UK", logo: "⚖️" },
+  { id: "ucw", name: "University Canada West", country: "Canada", logo: "🍁" },
+  { id: "unf", name: "University of Niagara Falls", country: "Canada", logo: "🌊" },
+  { id: "gisma", name: "Gisma University", country: "Germany", logo: "🏛️" },
+  { id: "ue", name: "University of Europe for Applied Sciences", country: "Germany", logo: "🔬" },
+  { id: "sdsu", name: "San Diego State University", country: "USA", logo: "🏫" },
+  { id: "cccu", name: "Canterbury Christ Church University", country: "UK", logo: "📚" },
+  { id: "concordia", name: "Concordia University Chicago", country: "USA", logo: "🏛️" },
+  { id: "rpi", name: "Rensselaer Polytechnic Institute", country: "USA", logo: "🔬" },
+  { id: "upes", name: "UPES", country: "India", logo: "🎓" },
+  { id: "hartpury", name: "Hartpury University", country: "UK", logo: "🌿" },
+];
+
+const COLLAB_INTERESTS = [
+  { key: "joint_research", label: "Joint Research Projects" },
+  { key: "tne", label: "Transnational Education (TNE)" },
+  { key: "faculty_exchange", label: "Faculty Exchange & Joint Appointments" },
+  { key: "student_mobility", label: "Student Mobility & Exchange" },
+  { key: "joint_degrees", label: "Joint Degrees & Validation" },
+  { key: "digital_learning", label: "Shared Digital Learning Platforms" },
+  { key: "research_networks", label: "Research Networks & Consortia" },
+  { key: "industry_integration", label: "Industry + Global Partner Integration" },
+];
+
+const GrantsIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="16" r="14" stroke="#1a2332" strokeWidth="1.5" fill="none" />
+    <circle cx="16" cy="16" r="10" stroke="#1a2332" strokeWidth="1" fill="none" opacity="0.3" />
+    <path d="M16 8v16M12 12.5c0-1.5 1.5-2.5 4-2.5s4 1 4 2.5-1.5 2.5-4 3-4 1.5-4 3 1.5 2.5 4 2.5 4-1 4-2.5" stroke="#1a2332" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const COLLABORATION_TYPES = [
+  { key: "student_referral", title: "Student Referral", icon: "👥", desc: "Refer students to western partner universities and earn academic mobility credits for each enrolled student.", color: "#1a5276" },
+  { key: "tne", title: "Transnational Education (TNE)", icon: "🌐", desc: "Establish joint delivery partnerships including franchise, validation, and articulation arrangements.", color: "#1e8449" },
+  { key: "academic_progression", title: "Academic Progressions", icon: "📈", desc: "Create structured pathways such as 2+2, 3+1, or top-up programmes for undergraduate and postgraduate students.", color: "#7d3c98" },
+  { key: "research", title: "Research Collaboration", icon: "🔬", desc: "Joint research initiatives, co-authored publications, shared labs and resources across institutions.", color: "#b9770e" },
+  { key: "grants", title: "Grants & Funding", icon: "grants_custom", desc: "Access to joint grant applications, faculty development funds, and collaborative funding opportunities.", color: "#34495e" },
+  { key: "intel_exchange", title: "Intelligence Exchange", icon: "🤝", desc: "Share academic insights, best practices, curriculum innovations, and institutional knowledge.", color: "#2980b9" },
+];
+
+const TNE_MODELS = [
+  { id: "2plus2", label: "2+2 Undergraduate", desc: "2 years home institution + 2 years western university" },
+  { id: "3plus1", label: "3+1 Undergraduate", desc: "3 years home institution + 1 year western university" },
+  { id: "1plus1", label: "1+1 Postgraduate", desc: "1 year home institution + 1 year western university" },
+  { id: "franchise", label: "Franchise Delivery", desc: "Full programme delivered at partner institution" },
+  { id: "validation", label: "Validated Programme", desc: "Partner-designed programme validated by western university" },
+  { id: "dual_degree", label: "Dual/Joint Degree", desc: "Students receive awards from both institutions" },
+  { id: "topup", label: "Top-Up Programme", desc: "Direct entry to final year of undergraduate degree" },
+];
+
+const MOCK_REFERRALS = [
+  { sid: "STU-2026-0041", university: "arden", stage: 3, date: "2026-03-12" },
+  { sid: "STU-2026-0087", university: "ulaw", stage: 3, date: "2026-02-28" },
+  { sid: "STU-2026-0102", university: "ucw", stage: 2, date: "2026-03-20" },
+  { sid: "STU-2026-0119", university: "arden", stage: 2, date: "2026-03-25" },
+  { sid: "STU-2026-0133", university: "gisma", stage: 1, date: "2026-04-01" },
+  { sid: "STU-2026-0148", university: "sdsu", stage: 1, date: "2026-04-05" },
+  { sid: "STU-2026-0156", university: "concordia", stage: 3, date: "2026-01-15" },
+  { sid: "STU-2026-0171", university: "ue", stage: 2, date: "2026-03-18" },
+  { sid: "STU-2026-0189", university: "unf", stage: 1, date: "2026-04-10" },
+  { sid: "STU-2026-0195", university: "ulaw", stage: 3, date: "2026-02-10" },
+];
+
+const STAGES = {
+  1: { label: "Showed Interest", color: "#d4a017", bg: "#fef9e7" },
+  2: { label: "Received Offer", color: "#2471a3", bg: "#ebf5fb" },
+  3: { label: "Enrolled", color: "#1e8449", bg: "#eafaf1" },
+};
+
+const TOKEN_VALUE = 250;
+
+function AnimatedNumber({ value, duration = 1200 }) {
+  const [display, setDisplay] = useState(0);
+  useEffect(() => {
+    let start = 0;
+    const step = value / (duration / 16);
+    const id = setInterval(() => {
+      start += step;
+      if (start >= value) { setDisplay(value); clearInterval(id); }
+      else setDisplay(Math.floor(start));
+    }, 16);
+    return () => clearInterval(id);
+  }, [value]);
+  return <span>{display.toLocaleString()}</span>;
+}
+
+const today = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+
+// ─── EOI FORM ───────────────────────────────────────────────
+function EOIForm({ onSubmit }) {
+  const [form, setForm] = useState({
+    institution: "", country: "", city: "", type: "", contact: "",
+    jobTitle: "", department: "", email: "", phone: "",
+  });
+  const [collabInterests, setCollabInterests] = useState({});
+  const [uploadedFile, setUploadedFile] = useState(null);
+  const fileInputRef = useRef(null);
+
+  const set = (k, v) => setForm(prev => ({ ...prev, [k]: v }));
+  const toggleCollab = (key) => setCollabInterests(prev => ({ ...prev, [key]: !prev[key] }));
+  const handleFileChange = (e) => { if (e.target.files[0]) setUploadedFile(e.target.files[0]); };
+
+  const hasCollabSelected = Object.values(collabInterests).some(v => v);
+  const textFieldsFilled = form.institution && form.country && form.city && form.type && form.contact && form.jobTitle && form.department && form.email && form.phone;
+  const valid = textFieldsFilled && hasCollabSelected && uploadedFile;
+
+  return (
+    <div style={{ animation: "fadeUp 0.6s ease" }}>
+      <div style={{ textAlign: "center", marginBottom: 48 }}>
+        <div style={{ fontSize: 13, letterSpacing: 4, color: "#7f8c8d", textTransform: "uppercase", marginBottom: 8 }}>Expression of Interest</div>
+        <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 32, color: "#1a2332", margin: 0, fontWeight: 700 }}>INUNI</h2>
+        <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 20, color: "#5a6a7a", fontStyle: "italic", marginTop: 8, lineHeight: 1.5 }}>
+          Advancing Global Research Through Academic Intelligence
+        </p>
+      </div>
+      <div style={{ display: "grid", gap: 28 }}>
+        {[["institution", "Name of Institution"], ["country", "Country"], ["city", "City"]].map(([k, label], i) => (
+          <div key={k}>
+            <label style={labelStyle}>{i + 1}. {label}</label>
+            <input style={inputStyle} value={form[k]} onChange={e => set(k, e.target.value)} placeholder="Enter your answer" />
+          </div>
+        ))}
+        <div>
+          <label style={labelStyle}>4. Type of Institution</label>
+          <div style={{ display: "flex", gap: 32, marginTop: 10 }}>
+            {["Private", "Public"].map(t => (
+              <div key={t} onClick={() => set("type", t)} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 15, color: "#2c3e50", padding: "8px 0", userSelect: "none" }}>
+                <div style={{ width: 22, height: 22, borderRadius: "50%", border: `2px solid ${form.type === t ? "#1a5276" : "#bdc3c7"}`, display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s", flexShrink: 0 }}>
+                  {form.type === t && <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#1a5276" }} />}
+                </div>
+                <span>{t}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        {[["contact", "Contact Person"], ["jobTitle", "Job Title"], ["department", "Department"], ["email", "Email Address"], ["phone", "Telephone Number"]].map(([k, label], i) => (
+          <div key={k}>
+            <label style={labelStyle}>{i + 5}. {label}</label>
+            <input style={inputStyle} value={form[k]} onChange={e => set(k, e.target.value)} placeholder="Enter your answer" type={k === "email" ? "email" : k === "phone" ? "tel" : "text"} />
+          </div>
+        ))}
+        <div>
+          <label style={labelStyle}>10. Areas of Collaboration Interest</label>
+          <p style={{ fontSize: 12, color: "#95a5a6", margin: "4px 0 16px", lineHeight: 1.5 }}>Please select all areas you are interested in exploring with INUNI partner universities.</p>
+          <div style={{ display: "grid", gap: 8 }}>
+            {COLLAB_INTERESTS.map((c, idx) => {
+              const checked = !!collabInterests[c.key];
+              return (
+                <div key={c.key} onClick={() => toggleCollab(c.key)} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", cursor: "pointer", transition: "all 0.2s", userSelect: "none", background: checked ? "#f0f7ff" : "#fafbfc", border: `1px solid ${checked ? "#1a5276" : "#e8ecf0"}` }}>
+                  <div style={{ width: 20, height: 20, borderRadius: 3, flexShrink: 0, border: `2px solid ${checked ? "#1a5276" : "#bdc3c7"}`, background: checked ? "#1a5276" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.2s" }}>
+                    {checked && <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6L5 9L10 3" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                  </div>
+                  <span style={{ fontSize: 14, color: checked ? "#1a2332" : "#4a5a6a" }}>{idx + 1}. {c.label}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        <div>
+          <label style={labelStyle}>11. Institution Registration Document</label>
+          <p style={{ fontSize: 12, color: "#95a5a6", margin: "4px 0 16px", lineHeight: 1.5 }}>Please upload a copy of your local institution registration or accreditation certificate.</p>
+          <input ref={fileInputRef} type="file" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" onChange={handleFileChange} style={{ display: "none" }} />
+          <div onClick={() => fileInputRef.current?.click()} style={{ border: `2px dashed ${uploadedFile ? "#1e8449" : "#d0d5da"}`, padding: uploadedFile ? "20px 24px" : "40px 24px", textAlign: "center", cursor: "pointer", background: uploadedFile ? "#eafaf1" : "#fafbfc", transition: "all 0.3s" }}>
+            {uploadedFile ? (
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12 }}>
+                <div style={{ width: 36, height: 36, background: "#1e8449", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 16, flexShrink: 0 }}>✓</div>
+                <div style={{ textAlign: "left" }}>
+                  <div style={{ fontSize: 14, color: "#1a2332", fontWeight: 500 }}>{uploadedFile.name}</div>
+                  <div style={{ fontSize: 12, color: "#7f8c8d", marginTop: 2 }}>{(uploadedFile.size / 1024).toFixed(1)} KB — Click to replace</div>
+                </div>
+              </div>
+            ) : (
+              <><div style={{ fontSize: 32, marginBottom: 8, color: "#bdc3c7" }}>⬆</div><div style={{ fontSize: 14, color: "#5d6d7e", marginBottom: 4 }}>Click to upload your registration document</div><div style={{ fontSize: 12, color: "#95a5a6" }}>PDF, JPG, PNG, DOC, or DOCX</div></>
+            )}
+          </div>
+        </div>
+      </div>
+      <div style={{ textAlign: "center", marginTop: 48 }}>
+        <button onClick={() => valid && onSubmit(form)} disabled={!valid} style={{ background: valid ? "#1a2332" : "#bdc3c7", color: "#fff", border: "none", padding: "16px 56px", fontSize: 15, letterSpacing: 2, cursor: valid ? "pointer" : "default", transition: "all 0.3s", fontFamily: "'DM Sans', sans-serif", textTransform: "uppercase" }}>
+          Submit Expression of Interest
+        </button>
+        {!valid && textFieldsFilled && (
+          <div style={{ marginTop: 14, fontSize: 12, color: "#c0392b", lineHeight: 1.6 }}>
+            {!hasCollabSelected && <span>Please select at least one area of collaboration.<br /></span>}
+            {!uploadedFile && <span>Please upload your institution registration document.</span>}
+          </div>
+        )}
+      </div>
+
+      {/* Governance Guidelines */}
+      <div style={{ marginTop: 56, borderTop: "1px solid #e8ecf0", paddingTop: 36 }}>
+        <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 17, color: "#1a2332", marginBottom: 20, fontWeight: 700 }}>
+          INUNI Data, Governance & Participation Guidelines
+        </h3>
+        <div style={{ fontSize: 13, color: "#5a6a7a", lineHeight: 1.85 }}>
+          <p style={{ marginBottom: 16 }}>All information submitted through INUNI platforms and forms is handled in accordance with applicable data protection standards, including GDPR (General Data Protection Regulation) requirements.</p>
+          <p style={{ marginBottom: 16 }}>Data is collected and processed solely for the purpose of enabling academic collaboration, partnership development, and institutional engagement within the INUNI global university network. Information will not be shared outside approved INUNI partner institutions without appropriate consent and governance safeguards.</p>
+          <p style={{ marginBottom: 16 }}>Each participating university may nominate an authorised representative from its executive or delegated leadership team to complete submissions on behalf of the institution. This representative must be formally appointed or employed within the university's executive or international/global engagement function.</p>
+          <p style={{ marginBottom: 16 }}>Upon submission of the completed form, the INUNI Partnerships Team will review the information and arrange a validation call with the nominated representative. This step is intended to confirm institutional details, ensure accuracy of submitted data, and assess alignment for potential collaboration within the INUNI network.</p>
+          <p>Following validation, INUNI will determine appropriate engagement pathways and explore opportunities for collaboration with interested universities.</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── MOU SIGNING (REAL MOU) ─────────────────────────────────
+function MOUSigning({ institution, onSign }) {
+  const [inuniName, setInuniName] = useState("");
+  const [inuniTitle, setInuniTitle] = useState("");
+  const [partnerName, setPartnerName] = useState("");
+  const [partnerTitle, setPartnerTitle] = useState("");
+  const bothSigned = inuniName.trim() && inuniTitle.trim() && partnerName.trim() && partnerTitle.trim();
+
+  return (
+    <div style={{ animation: "fadeUp 0.6s ease" }}>
+      <div style={{ textAlign: "center", marginBottom: 40 }}>
+        <div style={{ fontSize: 12, letterSpacing: 4, color: "#7f8c8d", textTransform: "uppercase", marginBottom: 8 }}>Step 2 — Onboarding</div>
+        <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 28, color: "#1a2332", margin: 0 }}>Memorandum of Understanding</h2>
+        <p style={{ color: "#7f8c8d", fontSize: 14, marginTop: 8 }}>Digital signature required from both parties</p>
+      </div>
+
+      <div style={{ background: "#fafbfc", border: "1px solid #e8ecf0", padding: "40px 48px", maxHeight: 400, overflowY: "auto", marginBottom: 32, lineHeight: 1.85, fontSize: 13.5, color: "#3d4f5f" }}>
+        <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, color: "#1a2332", marginBottom: 4, textAlign: "center" }}>MEMORANDUM OF UNDERSTANDING</h3>
+        <p style={{ textAlign: "center", fontSize: 12, color: "#7f8c8d", marginBottom: 24, letterSpacing: 1, textTransform: "uppercase" }}>Subject to Contract</p>
+
+        <p>This memorandum of understanding (the "<strong>MOU</strong>") is made on <strong>{today}</strong> by and between Inuni Marketing Limited ("<strong>Inuni</strong>"), of 30 Holborn, Buchanan House, London, England, EC1N 2HS and <strong>{institution}</strong> ("<strong>Partner Institution</strong>") (collectively referred to as "<strong>Parties</strong>") and sets out the aims and objectives the Parties would be willing, in principle, to achieve subject to the agreement and signature by the Parties of a detailed legally binding agreement (the "<strong>Potential Agreement</strong>").</p>
+
+        <p>Inuni serves as a strategic platform for international student recruitment and academic partnerships, supporting higher-education institutions through recruitment, progression pathways, and transnational education (TNE) initiatives across the United States and Europe.</p>
+
+        <p>Partner Institution is recognized as a reputable institution/organization in its respective sector and region.</p>
+
+        <p>Inuni and Partner Institution are desirous of entering into this MOU between them, setting out the mutually accepted expectations that each of the Parties agrees are necessary to complete the Projects (defined below) and to the extent reasonably possible and subject to a legally binding contract.</p>
+
+        <p>These terms are not exhaustive and are not, nor are they intended to be, legally binding between the Parties, except where specifically provided to the contrary below.</p>
+
+        <p style={{ marginTop: 20 }}><strong>1. Purpose</strong></p>
+        <p style={{ paddingLeft: 16 }}>1.1 This paragraph 1 is not legally binding.</p>
+        <p style={{ paddingLeft: 16 }}>1.2 The Parties intend to establish and promote institutional cooperation under this MOU for each strategic initiative indicated below (the "<strong>Projects</strong>"), and to mutually engage in the necessary planning, structures, and operations with the aim of execution of a Potential Agreement for the successful implementation of the Projects, which the Parties intend to include:</p>
+        <p style={{ paddingLeft: 32 }}>(a) Exploring articulation and pathway agreements.</p>
+        <p style={{ paddingLeft: 32 }}>(b) Identifying opportunities for joint research activities.</p>
+        <p style={{ paddingLeft: 32 }}>(c) Investigating faculty and student exchange programs.</p>
+        <p style={{ paddingLeft: 32 }}>(d) Promoting other academic activities, as jointly agreed upon, to better enhance mutual understanding and cooperation between the institutions.</p>
+        <p style={{ paddingLeft: 32 }}>(e) Involvement in grant opportunities and academic workshops, on a case-by-case basis and subject to mutual agreement.</p>
+
+        <p style={{ marginTop: 20 }}><strong>2. Understanding</strong></p>
+        <p style={{ paddingLeft: 16 }}>2.1 This paragraph 2 is not legally binding.</p>
+        <p style={{ paddingLeft: 16 }}>2.2 It is intended that each Party will work together in a coordinated fashion towards agreeing a Potential Agreement for the Projects.</p>
+        <p style={{ paddingLeft: 16 }}>2.3 To the extent possible, each Party will participate in the development of the Projects.</p>
+        <p style={{ paddingLeft: 16 }}>2.4 Either Party may at any time by notice to the other, terminate negotiations and entry into any Potential Agreement, without incurring any liability to the other Party.</p>
+
+        <p style={{ marginTop: 20 }}><strong>3. Publicity and Confidentiality</strong></p>
+        <p style={{ paddingLeft: 16 }}>3.1 This paragraph 3 is legally binding.</p>
+        <p style={{ paddingLeft: 16 }}>3.2 The content of this MOU is confidential to the Parties.</p>
+        <p style={{ paddingLeft: 16 }}>3.3 The Parties acknowledge that no contractual relationship is created between them by this MOU.</p>
+        <p style={{ paddingLeft: 16 }}>3.4 Subject to the execution of a Potential Agreement, the logos and other marks of both Parties may be placed on each other's media with associated hyperlinks. Both Parties shall approve any public announcement regarding this MOU. No public announcements will be made about the Potential Agreement(s) and/or the content and existence of this MOU unless the Parties agree in writing.</p>
+        <p style={{ paddingLeft: 16 }}>3.5 Each Party may require that its logo and other marks be implemented in accordance with respective brand guidelines. No logos or other trademarks of a Party may be used without the prior written consent of the other Party.</p>
+
+        <p style={{ marginTop: 20 }}><strong>4. Governing Law</strong></p>
+        <p style={{ paddingLeft: 16 }}>4.1 This paragraph 4 is legally binding.</p>
+        <p style={{ paddingLeft: 16 }}>4.2 This MOU and any dispute or claim arising out of or in connection with them or their subject matter or formation (including non-contractual disputes or claims) shall be governed by and construed in accordance with the laws of England and Wales.</p>
+        <p style={{ paddingLeft: 16 }}>4.3 The Parties irrevocably agree that the courts of England and Wales shall have exclusive jurisdiction to settle any dispute or claim arising out of or in connection with this MOU.</p>
+
+        <p style={{ marginTop: 24 }}>The Parties support, in principle, the goals and objectives to promote institutional cooperation between Inuni and Partner Institution, subject to the execution of a Potential Agreement and approval of the Potential Agreement by the board of directors of each Party.</p>
+        <p>Each party hereby confirms its agreement to the terms contained in this MOU.</p>
+      </div>
+
+      {/* Signature Block */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24, marginBottom: 32 }}>
+        <div style={{ border: "1px solid #e0e5ea", padding: 28 }}>
+          <div style={{ fontSize: 12, letterSpacing: 2, color: "#7f8c8d", textTransform: "uppercase", marginBottom: 16 }}>For Inuni Marketing Limited</div>
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ fontSize: 11, color: "#95a5a6", letterSpacing: 1, textTransform: "uppercase", display: "block", marginBottom: 6 }}>Full Name</label>
+            <input value={inuniName} onChange={e => setInuniName(e.target.value)} placeholder="Type full name" style={{ ...sigInputStyle }} />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ fontSize: 11, color: "#95a5a6", letterSpacing: 1, textTransform: "uppercase", display: "block", marginBottom: 6 }}>Job Title</label>
+            <input value={inuniTitle} onChange={e => setInuniTitle(e.target.value)} placeholder="Type job title" style={{ ...sigInputStyle }} />
+          </div>
+          <div style={{ fontSize: 12, color: "#7f8c8d", marginTop: 12 }}>Date: <strong>{today}</strong></div>
+        </div>
+        <div style={{ border: "1px solid #e0e5ea", padding: 28 }}>
+          <div style={{ fontSize: 12, letterSpacing: 2, color: "#7f8c8d", textTransform: "uppercase", marginBottom: 16 }}>For {institution}</div>
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ fontSize: 11, color: "#95a5a6", letterSpacing: 1, textTransform: "uppercase", display: "block", marginBottom: 6 }}>Full Name</label>
+            <input value={partnerName} onChange={e => setPartnerName(e.target.value)} placeholder="Type full name" style={{ ...sigInputStyle }} />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ fontSize: 11, color: "#95a5a6", letterSpacing: 1, textTransform: "uppercase", display: "block", marginBottom: 6 }}>Job Title</label>
+            <input value={partnerTitle} onChange={e => setPartnerTitle(e.target.value)} placeholder="Type job title" style={{ ...sigInputStyle }} />
+          </div>
+          <div style={{ fontSize: 12, color: "#7f8c8d", marginTop: 12 }}>Date: <strong>{today}</strong></div>
+        </div>
+      </div>
+
+      {bothSigned && (
+        <div style={{ textAlign: "center", animation: "fadeUp 0.4s ease" }}>
+          <button onClick={() => onSign({ inuniName, inuniTitle, partnerName, partnerTitle, date: today })} style={{ background: "#1e8449", color: "#fff", border: "none", padding: "16px 48px", fontSize: 14, letterSpacing: 2, cursor: "pointer", textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif" }}>
+            Sign & Proceed to Dashboard →
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── REVIEW PENDING ──────────────────────────────────────────
+const GUS_INSTITUTIONS = [
+  // Row 1 — Universities
+  { name: "Arden University", abbr: "AU", color: "#0097a7" },
+  { name: "The Language Gallery", abbr: "TLG", color: "#9c27b0" },
+  { name: "The University of Law", abbr: "ULaw", color: "#4a148c" },
+  // Row 2
+  { name: "UPES", abbr: "UPES", color: "#e65100" },
+  { name: "University Canada West", abbr: "UCW", color: "#c62828" },
+  { name: "University of Niagara Falls", abbr: "UNF", color: "#00838f" },
+  // Row 3
+  { name: "Gisma University of Applied Sciences", abbr: "GISMA", color: "#f9a825" },
+  { name: "University of Europe for Applied Sciences", abbr: "UE", color: "#c62828" },
+  { name: "UE Amsterdam", abbr: "UE-A", color: "#1a237e" },
+  // Row 4
+  { name: "SABA University School of Medicine", abbr: "SABA", color: "#1565c0" },
+  { name: "Medical University of the Americas", abbr: "MUA", color: "#6a1b1a" },
+  { name: "St. Matthew's University", abbr: "SMU", color: "#5d4037" },
+  // Row 5
+  { name: "FutureLearn", abbr: "FL", color: "#d81b60" },
+  { name: "London School of Business & Finance", abbr: "LSBF", color: "#212121" },
+  { name: "Pearl Academy", abbr: "PA", color: "#e64a19" },
+  // Row 6
+  { name: "BSBI School of Business & Innovation", abbr: "BSBI", color: "#1565c0" },
+  { name: "The Language Gallery Canada", abbr: "TLGC", color: "#9c27b0" },
+  { name: "London College of Contemporary Arts", abbr: "LCCA", color: "#212121" },
+  // Row 7
+  { name: "htk academy", abbr: "htk", color: "#ff6f00" },
+  { name: "Toronto School of Management", abbr: "TSoM", color: "#c62828" },
+  { name: "London Academy of Trading", abbr: "LAT", color: "#00838f" },
+  // Row 8
+  { name: "Trebas Institute", abbr: "TI", color: "#4527a0" },
+  { name: "LSBF Singapore Campus", abbr: "LSBF-S", color: "#4a148c" },
+  { name: "Canadian College of Technology & Business", abbr: "CCTB", color: "#00695c" },
+  // Row 9
+  { name: "Fleming College Toronto", abbr: "FCT", color: "#c62828" },
+  { name: "LCCM London College of Contemporary Music", abbr: "LCCM", color: "#212121" },
+  { name: "IBAT Dublin", abbr: "IBAT", color: "#c62828" },
+  // Row 10
+  { name: "Niagara College Canada", abbr: "NC", color: "#2e7d32" },
+  { name: "INT Institute of Innovation & Technology", abbr: "INT", color: "#37474f" },
+  { name: "HighQ Education", abbr: "HQ", color: "#f9a825" },
+  // Row 11
+  { name: "Ontario Institute of Health & Innovation", abbr: "OIHI", color: "#0097a7" },
+];
+
+const PARTNER_UNIVERSITIES = [
+  { name: "Concordia University Chicago", abbr: "CUC", color: "#6a1b1a" },
+  { name: "Avila University", abbr: "AVU", color: "#1a237e" },
+  { name: "Herzing University", abbr: "HU", color: "#212121" },
+  { name: "LIM College", abbr: "LIM", color: "#1565c0" },
+  { name: "Penn State Dickinson Law", abbr: "PSU", color: "#1565c0" },
+  { name: "The University of Akron", abbr: "UA", color: "#1a237e" },
+  { name: "Canterbury Christ Church University", abbr: "CCCU", color: "#0d47a1" },
+  { name: "Hartpury University", abbr: "HPU", color: "#1a237e" },
+  { name: "San Diego State University", abbr: "SDSU", color: "#c62828" },
+  { name: "Rensselaer Polytechnic Institute", abbr: "RPI", color: "#c62828" },
+];
+
+function UniLogoTile({ uni }) {
+  return (
+    <div style={{
+      padding: "18px 12px", background: "#fff", border: "1px solid #eef1f4",
+      display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+      gap: 8, minHeight: 80, transition: "all 0.3s",
+    }}
+      onMouseOver={e => { e.currentTarget.style.borderColor = uni.color; e.currentTarget.style.transform = "translateY(-1px)"; }}
+      onMouseOut={e => { e.currentTarget.style.borderColor = "#eef1f4"; e.currentTarget.style.transform = "none"; }}
+    >
+      <div style={{
+        fontSize: uni.abbr.length > 4 ? 13 : 16, fontWeight: 800, color: uni.color,
+        letterSpacing: uni.abbr.length <= 4 ? 2 : 1, fontFamily: "'DM Sans', sans-serif",
+        textAlign: "center", lineHeight: 1.1,
+      }}>
+        {uni.abbr}
+      </div>
+      <div style={{ fontSize: 10, color: "#7f8c8d", textAlign: "center", lineHeight: 1.3, maxWidth: 120 }}>{uni.name}</div>
+    </div>
+  );
+}
+
+function ReviewPending({ institution, onApprove }) {
+  return (
+    <div style={{ animation: "fadeUp 0.6s ease" }}>
+      <div style={{ textAlign: "center", padding: "48px 0 40px" }}>
+        <div style={{ fontSize: 48, marginBottom: 24 }}>📋</div>
+        <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 28, color: "#1a2332", marginBottom: 12 }}>Under Review</h2>
+        <p style={{ color: "#7f8c8d", fontSize: 15, maxWidth: 480, margin: "0 auto 8px", lineHeight: 1.7 }}>
+          Thank you, <strong>{institution}</strong>. Your Expression of Interest has been received and is being reviewed by the INUNI team.
+        </p>
+        <p style={{ color: "#95a5a6", fontSize: 13, marginBottom: 40 }}>You will be notified once the review is complete.</p>
+        <button onClick={onApprove} style={{ background: "transparent", color: "#1a5276", border: "1px solid #1a5276", padding: "12px 36px", fontSize: 13, letterSpacing: 1, cursor: "pointer", textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif" }}>
+          Simulate: Approve & Invite →
+        </button>
+      </div>
+
+      {/* GUS Group Institutions */}
+      <div style={{ marginTop: 48, borderTop: "1px solid #e8ecf0", paddingTop: 40 }}>
+        <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <div style={{ fontSize: 11, letterSpacing: 3, color: "#95a5a6", textTransform: "uppercase", marginBottom: 8 }}>Our Network</div>
+          <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, color: "#1a2332", margin: 0 }}>GUS Group Institutions</h3>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 10, marginBottom: 48 }}>
+          {GUS_INSTITUTIONS.map((uni, i) => <UniLogoTile key={i} uni={uni} />)}
+        </div>
+
+        <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 22, color: "#1a2332", margin: 0 }}>Partner Universities</h3>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 10 }}>
+          {PARTNER_UNIVERSITIES.map((uni, i) => <UniLogoTile key={i} uni={uni} />)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── MOCK DATA FOR REDEMPTIONS ──────────────────────────────
+const AVAILABLE_CONFERENCES = [
+  { id: "conf1", name: "INUNI Global Academic Summit 2026", location: "London, UK", date: "15–17 September 2026", credits: 180 },
+  { id: "conf2", name: "International TNE & Partnerships Forum", location: "Toronto, Canada", date: "22–23 October 2026", credits: 220 },
+  { id: "conf3", name: "GUS Group Higher Education Innovation Conference", location: "Berlin, Germany", date: "10–12 November 2026", credits: 200 },
+  { id: "conf4", name: "Asia-Pacific Academic Collaboration Summit", location: "Singapore", date: "3–5 December 2026", credits: 250 },
+];
+
+const AVAILABLE_WORKSHOPS = [
+  { id: "ws1", name: "AI in Higher Education: Curriculum Design Workshop", location: "Online + London Hub", date: "8–9 August 2026", credits: 120 },
+  { id: "ws2", name: "Joint Research Methodology & Grant Writing", location: "Berlin, Germany", date: "19–20 September 2026", credits: 150 },
+  { id: "ws3", name: "TNE Quality Assurance & Compliance Workshop", location: "Online", date: "14 October 2026", credits: 80 },
+  { id: "ws4", name: "Cross-Border Student Mobility Frameworks", location: "Toronto, Canada", date: "5–6 November 2026", credits: 140 },
+];
+
+// ─── CREDITS TAB COMPONENT ──────────────────────────────────
+function CreditsTab({ tokenBalance, enrolled }) {
+  const [redeemMode, setRedeemMode] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
+
+  // Scholarship
+  const [scholStudentId, setScholStudentId] = useState("");
+  const [scholUni, setScholUni] = useState("");
+  const [scholAmount, setScholAmount] = useState("");
+
+  // Invite partner
+  const [invName, setInvName] = useState("");
+  const [invUni, setInvUni] = useState("");
+  const [invDateFrom, setInvDateFrom] = useState("");
+  const [invDateTo, setInvDateTo] = useState("");
+  const [invReason, setInvReason] = useState("");
+
+  // Trip
+  const [tripName, setTripName] = useState("");
+  const [tripPosition, setTripPosition] = useState("");
+  const [tripUni, setTripUni] = useState("");
+  const [tripDateFrom, setTripDateFrom] = useState("");
+  const [tripDateTo, setTripDateTo] = useState("");
+  const [tripDesc, setTripDesc] = useState("");
+
+  // Conference & Workshop
+  const [selectedConf, setSelectedConf] = useState(null);
+  const [selectedWs, setSelectedWs] = useState(null);
+
+  const handleSubmit = () => { setSubmitted(true); };
+  const resetForm = () => { setRedeemMode(null); setSubmitted(false); setScholStudentId(""); setScholUni(""); setScholAmount(""); setInvName(""); setInvUni(""); setInvDateFrom(""); setInvDateTo(""); setInvReason(""); setTripName(""); setTripPosition(""); setTripUni(""); setTripDateFrom(""); setTripDateTo(""); setTripDesc(""); setSelectedConf(null); setSelectedWs(null); };
+
+  const fld = (label, value, setter, type = "text", placeholder = "") => (
+    <div style={{ marginBottom: 16 }}>
+      <label style={{ fontSize: 11, letterSpacing: 1.5, color: "#7f8c8d", textTransform: "uppercase", display: "block", marginBottom: 6 }}>{label}</label>
+      <input value={value} onChange={e => setter(e.target.value)} type={type} placeholder={placeholder || `Enter ${label.toLowerCase()}`} style={{ width: "100%", padding: "11px 14px", border: "1px solid #dce1e6", fontSize: 14, color: "#1a2332", outline: "none", background: "#fff", fontFamily: "'DM Sans', sans-serif", boxSizing: "border-box" }} />
+    </div>
+  );
+
+  const uniSelect = (value, setter) => (
+    <div style={{ marginBottom: 16 }}>
+      <label style={{ fontSize: 11, letterSpacing: 1.5, color: "#7f8c8d", textTransform: "uppercase", display: "block", marginBottom: 6 }}>University</label>
+      <select value={value} onChange={e => setter(e.target.value)} style={{ width: "100%", padding: "11px 14px", border: "1px solid #dce1e6", fontSize: 14, color: value ? "#1a2332" : "#95a5a6", outline: "none", background: "#fff", fontFamily: "'DM Sans', sans-serif", boxSizing: "border-box" }}>
+        <option value="">Select university</option>
+        {UNIVERSITIES_WESTERN.map(u => <option key={u.id} value={u.id}>{u.name} — {u.country}</option>)}
+      </select>
+    </div>
+  );
+
+  const REDEEM_OPTIONS = [
+    { key: "scholarship", title: "Scholarship for a Student", icon: "🎓", desc: "Allocate credits toward a tuition scholarship for a referred student at a GUS Group or partner institution.", credits: "Variable" },
+    { key: "invite", title: "Invite a Partner University Representative", icon: "🤝", desc: "Use credits to fund a visit from a partner institution representative for academic engagement or collaboration discussions.", credits: "200–400" },
+    { key: "trip", title: "University Visit", icon: "✈️", desc: "Fund a delegation visit to a GUS Group or partner university for institutional engagement and partnership development.", credits: "250–500" },
+    { key: "conference", title: "Conference Attendance", icon: "🎤", desc: "Redeem credits for attendance at an upcoming INUNI or GUS Group academic conference.", credits: "80–250" },
+    { key: "workshop", title: "Joint Research Workshop", icon: "🔬", desc: "Participate in a collaborative research workshop hosted within the INUNI network.", credits: "80–150" },
+  ];
+
+  if (submitted) {
+    return (
+      <div style={{ animation: "fadeUp 0.4s ease", textAlign: "center", padding: "60px 0" }}>
+        <div style={{ width: 64, height: 64, background: "#eafaf1", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px", fontSize: 28 }}>✓</div>
+        <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 24, color: "#1a2332", marginBottom: 12 }}>Redemption Request Submitted</h3>
+        <p style={{ fontSize: 14, color: "#7f8c8d", maxWidth: 480, margin: "0 auto 8px", lineHeight: 1.7 }}>
+          Your request has been submitted for review by the INUNI Partnerships Team. You will receive confirmation once the request has been assessed and approved.
+        </p>
+        <p style={{ fontSize: 12, color: "#95a5a6", fontStyle: "italic", maxWidth: 440, margin: "0 auto 32px" }}>
+          Please note that once a redemption request has been approved, the allocation is considered final and may not be amended, transferred, or reversed.
+        </p>
+        <button onClick={resetForm} style={{ background: "#1a2332", color: "#fff", border: "none", padding: "12px 36px", fontSize: 13, letterSpacing: 1, cursor: "pointer", textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif" }}>
+          Return to Credits
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ animation: "fadeUp 0.4s ease" }}>
+      {/* Balance Card */}
+      <div style={{ background: "linear-gradient(135deg, #1a2332 0%, #2c3e50 100%)", padding: 48, color: "#fff", marginBottom: 32, position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: -40, right: -40, width: 200, height: 200, border: "1px solid rgba(255,255,255,0.06)", borderRadius: "50%" }} />
+        <div style={{ position: "absolute", top: -20, right: -20, width: 140, height: 140, border: "1px solid rgba(255,255,255,0.04)", borderRadius: "50%" }} />
+        <div style={{ fontSize: 11, letterSpacing: 3, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", marginBottom: 8 }}>INUNI Academic Mobility Credits</div>
+        <div style={{ fontSize: 52, fontFamily: "'Playfair Display', serif", fontWeight: 700, marginBottom: 4 }}><AnimatedNumber value={tokenBalance} /> <span style={{ fontSize: 18, fontWeight: 400, opacity: 0.6 }}>credits</span></div>
+        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)" }}>{enrolled} enrolled students × {TOKEN_VALUE} credits each</div>
+      </div>
+
+      {/* Ledger */}
+      <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: "#1a2332", marginBottom: 16 }}>Credit Ledger</h3>
+      <div style={{ border: "1px solid #e8ecf0", marginBottom: 32 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr 1fr 1fr", background: "#f7f9fb", padding: "12px 24px", fontSize: 11, letterSpacing: 2, color: "#7f8c8d", textTransform: "uppercase", borderBottom: "1px solid #e8ecf0" }}>
+          <div>Date</div><div>Description</div><div>Type</div><div style={{ textAlign: "right" }}>Credits</div>
+        </div>
+        {MOCK_REFERRALS.filter(r => r.stage === 3).map((r, i) => {
+          const uni = UNIVERSITIES_WESTERN.find(u => u.id === r.university);
+          return (
+            <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 2fr 1fr 1fr", padding: "14px 24px", fontSize: 13, borderBottom: "1px solid #f0f3f5" }}>
+              <div style={{ color: "#7f8c8d" }}>{new Date(r.date).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}</div>
+              <div style={{ color: "#2c3e50" }}>Enrolment — {r.sid} → {uni?.name}</div>
+              <div><span style={{ background: "#eafaf1", color: "#1e8449", padding: "2px 10px", fontSize: 11, letterSpacing: 1 }}>CREDIT</span></div>
+              <div style={{ textAlign: "right", color: "#1e8449", fontWeight: 600, fontFamily: "'Playfair Display', serif", fontSize: 16 }}>+{TOKEN_VALUE}</div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Disclaimer */}
+      <div style={{ padding: 24, background: "#fafbfc", border: "1px solid #e8ecf0", marginBottom: 36 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "#1a2332", marginBottom: 10 }}>INUNI Academic Mobility Credits — Terms of Use</div>
+        <div style={{ fontSize: 12.5, color: "#5a6a7a", lineHeight: 1.85 }}>
+          <p style={{ margin: "0 0 10px" }}>INUNI Academic Mobility Credits are non-monetary digital units issued exclusively for the purpose of facilitating academic collaboration and institutional engagement within the GUS Group and INUNI Global network. Credits hold no cash value, are non-transferable to third parties, and may not be exchanged for currency or financial instruments under any circumstances.</p>
+          <p style={{ margin: "0 0 10px" }}>Credits may be redeemed solely against the approved services and opportunities listed below. All redemption requests are subject to review and formal approval by the INUNI Partnerships Team.</p>
+          <p style={{ margin: 0, fontStyle: "italic", color: "#7d6608", background: "#fef9e7", padding: "10px 14px", border: "1px solid #f9e79f" }}>Please note: once a redemption request has been submitted and approved by INUNI, the allocation is considered final. Approved redemptions may not be amended, reallocated to an alternative service, or reversed. Institutions are advised to ensure all details are accurate and confirmed prior to submission.</p>
+        </div>
+      </div>
+
+      {/* Redemption Options */}
+      <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: "#1a2332", marginBottom: 6 }}>Redeem Credits</h3>
+      <p style={{ fontSize: 13, color: "#7f8c8d", marginBottom: 24 }}>Select a redemption category and complete the required details to submit your request.</p>
+
+      {!redeemMode ? (
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+          {REDEEM_OPTIONS.map(opt => (
+            <div key={opt.key} onClick={() => setRedeemMode(opt.key)} style={{ padding: 24, border: "1px solid #e8ecf0", cursor: "pointer", transition: "all 0.3s", background: "#fff" }}
+              onMouseOver={e => { e.currentTarget.style.borderColor = "#1a5276"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+              onMouseOut={e => { e.currentTarget.style.borderColor = "#e8ecf0"; e.currentTarget.style.transform = "none"; }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+                <span style={{ fontSize: 26 }}>{opt.icon}</span>
+                <span style={{ fontSize: 11, color: "#95a5a6", letterSpacing: 1 }}>{opt.credits} CREDITS</span>
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "#1a2332", marginBottom: 6 }}>{opt.title}</div>
+              <div style={{ fontSize: 12, color: "#7f8c8d", lineHeight: 1.6 }}>{opt.desc}</div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div style={{ animation: "fadeUp 0.3s ease" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+            <h4 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: "#1a2332", margin: 0 }}>
+              {REDEEM_OPTIONS.find(o => o.key === redeemMode)?.icon} {REDEEM_OPTIONS.find(o => o.key === redeemMode)?.title}
+            </h4>
+            <button onClick={resetForm} style={{ background: "none", border: "1px solid #dce1e6", padding: "6px 16px", fontSize: 12, color: "#7f8c8d", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>← Back</button>
+          </div>
+
+          <div style={{ border: "1px solid #e8ecf0", padding: 28 }}>
+            {/* SCHOLARSHIP */}
+            {redeemMode === "scholarship" && (
+              <>
+                {fld("Student ID (if available)", scholStudentId, setScholStudentId, "text", "e.g. STU-2026-0041")}
+                {uniSelect(scholUni, setScholUni)}
+                {fld("Credit Amount to Allocate", scholAmount, setScholAmount, "number", "e.g. 250")}
+                <button onClick={handleSubmit} disabled={!scholUni || !scholAmount} style={{ ...submitBtnStyle, opacity: scholUni && scholAmount ? 1 : 0.4 }}>Submit Scholarship Request</button>
+              </>
+            )}
+
+            {/* INVITE PARTNER */}
+            {redeemMode === "invite" && (
+              <>
+                {fld("Full Name of Invitee", invName, setInvName)}
+                {fld("Invitee's University / Institution", invUni, setInvUni)}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  {fld("Travel Date From", invDateFrom, setInvDateFrom, "date")}
+                  {fld("Travel Date To", invDateTo, setInvDateTo, "date")}
+                </div>
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ fontSize: 11, letterSpacing: 1.5, color: "#7f8c8d", textTransform: "uppercase", display: "block", marginBottom: 6 }}>Purpose of Visit</label>
+                  <textarea value={invReason} onChange={e => setInvReason(e.target.value)} rows={3} placeholder="Briefly describe the purpose of the visit and expected outcomes" style={{ width: "100%", padding: "11px 14px", border: "1px solid #dce1e6", fontSize: 14, color: "#1a2332", outline: "none", background: "#fff", fontFamily: "'DM Sans', sans-serif", boxSizing: "border-box", resize: "vertical" }} />
+                </div>
+                <button onClick={handleSubmit} disabled={!invName || !invUni || !invDateFrom || !invReason} style={{ ...submitBtnStyle, opacity: invName && invUni && invDateFrom && invReason ? 1 : 0.4 }}>Submit Invitation Request</button>
+              </>
+            )}
+
+            {/* TRIP TO UNIVERSITY */}
+            {redeemMode === "trip" && (
+              <>
+                {fld("Full Name of Traveller", tripName, setTripName)}
+                {fld("Position / Title", tripPosition, setTripPosition)}
+                {uniSelect(tripUni, setTripUni)}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  {fld("Travel Date From", tripDateFrom, setTripDateFrom, "date")}
+                  {fld("Travel Date To", tripDateTo, setTripDateTo, "date")}
+                </div>
+                <div style={{ marginBottom: 16 }}>
+                  <label style={{ fontSize: 11, letterSpacing: 1.5, color: "#7f8c8d", textTransform: "uppercase", display: "block", marginBottom: 6 }}>Description of Engagement</label>
+                  <textarea value={tripDesc} onChange={e => setTripDesc(e.target.value)} rows={3} placeholder="Describe the nature of the visit and planned academic activities" style={{ width: "100%", padding: "11px 14px", border: "1px solid #dce1e6", fontSize: 14, color: "#1a2332", outline: "none", background: "#fff", fontFamily: "'DM Sans', sans-serif", boxSizing: "border-box", resize: "vertical" }} />
+                </div>
+                <button onClick={handleSubmit} disabled={!tripName || !tripPosition || !tripUni || !tripDateFrom || !tripDesc} style={{ ...submitBtnStyle, opacity: tripName && tripPosition && tripUni && tripDateFrom && tripDesc ? 1 : 0.4 }}>Submit Visit Request</button>
+              </>
+            )}
+
+            {/* CONFERENCE */}
+            {redeemMode === "conference" && (
+              <>
+                <div style={{ fontSize: 12, color: "#7f8c8d", marginBottom: 16 }}>Select from available conferences within the INUNI and GUS Group network.</div>
+                <div style={{ display: "grid", gap: 10, marginBottom: 20 }}>
+                  {AVAILABLE_CONFERENCES.map(c => (
+                    <div key={c.id} onClick={() => setSelectedConf(selectedConf === c.id ? null : c.id)} style={{ padding: 20, border: selectedConf === c.id ? "2px solid #1a5276" : "1px solid #e8ecf0", background: selectedConf === c.id ? "#f0f7ff" : "#fff", cursor: "pointer", transition: "all 0.2s" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div>
+                          <div style={{ fontSize: 14, fontWeight: 600, color: "#1a2332", marginBottom: 4 }}>{c.name}</div>
+                          <div style={{ fontSize: 12, color: "#7f8c8d" }}>{c.location} · {c.date}</div>
+                        </div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "#1a5276", whiteSpace: "nowrap", marginLeft: 16 }}>{c.credits} credits</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={handleSubmit} disabled={!selectedConf} style={{ ...submitBtnStyle, opacity: selectedConf ? 1 : 0.4 }}>Submit Conference Request</button>
+              </>
+            )}
+
+            {/* WORKSHOP */}
+            {redeemMode === "workshop" && (
+              <>
+                <div style={{ fontSize: 12, color: "#7f8c8d", marginBottom: 16 }}>Select from available joint research workshops within the INUNI network.</div>
+                <div style={{ display: "grid", gap: 10, marginBottom: 20 }}>
+                  {AVAILABLE_WORKSHOPS.map(w => (
+                    <div key={w.id} onClick={() => setSelectedWs(selectedWs === w.id ? null : w.id)} style={{ padding: 20, border: selectedWs === w.id ? "2px solid #1e8449" : "1px solid #e8ecf0", background: selectedWs === w.id ? "#eafaf1" : "#fff", cursor: "pointer", transition: "all 0.2s" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div>
+                          <div style={{ fontSize: 14, fontWeight: 600, color: "#1a2332", marginBottom: 4 }}>{w.name}</div>
+                          <div style={{ fontSize: 12, color: "#7f8c8d" }}>{w.location} · {w.date}</div>
+                        </div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "#1e8449", whiteSpace: "nowrap", marginLeft: 16 }}>{w.credits} credits</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={handleSubmit} disabled={!selectedWs} style={{ ...submitBtnStyle, opacity: selectedWs ? 1 : 0.4 }}>Submit Workshop Request</button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const submitBtnStyle = { background: "#1a2332", color: "#fff", border: "none", padding: "14px 40px", fontSize: 13, letterSpacing: 1.5, cursor: "pointer", textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif", marginTop: 8, transition: "opacity 0.3s" };
+
+// ─── DASHBOARD ──────────────────────────────────────────────
+function Dashboard({ institution, mouData, eoiData }) {
+  const [activeTab, setActiveTab] = useState("overview");
+  const [selectedCollab, setSelectedCollab] = useState(null);
+  const [tneSelections, setTneSelections] = useState({});
+  const [selectedUniForTNE, setSelectedUniForTNE] = useState(null);
+  const [mouDownloaded, setMouDownloaded] = useState(false);
+
+  const enrolled = MOCK_REFERRALS.filter(r => r.stage === 3).length;
+  const tokenBalance = enrolled * TOKEN_VALUE;
+  const offered = MOCK_REFERRALS.filter(r => r.stage === 2).length;
+  const interested = MOCK_REFERRALS.filter(r => r.stage === 1).length;
+
+  const tabs = [
+    { key: "overview", label: "Overview", icon: "◈" },
+    { key: "referrals", label: "Student Referrals", icon: "◇" },
+    { key: "credits", label: "Mobility Credits", icon: "◆" },
+    { key: "collaborate", label: "Collaborate", icon: "◎" },
+    { key: "tne", label: "TNE Partnerships", icon: "◉" },
+    { key: "support", label: "Support", icon: "◇" },
+  ];
+
+  const renderCollabIcon = (icon) => {
+    if (icon === "grants_custom") return <GrantsIcon />;
+    return <span style={{ fontSize: 28 }}>{icon}</span>;
+  };
+
+  return (
+    <div style={{ animation: "fadeUp 0.5s ease" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #e8ecf0", paddingBottom: 24, marginBottom: 32 }}>
+        <div>
+          <div style={{ fontSize: 11, letterSpacing: 3, color: "#95a5a6", textTransform: "uppercase", marginBottom: 4 }}>Partner Dashboard</div>
+          <h2 style={{ fontFamily: "'Playfair Display', serif", fontSize: 26, color: "#1a2332", margin: 0 }}>{institution}</h2>
+        </div>
+        <div style={{ background: "#eafaf1", border: "1px solid #d5f5e3", padding: "8px 20px", fontSize: 12, color: "#1e8449", letterSpacing: 1, textTransform: "uppercase" }}>● Active Partner</div>
+      </div>
+
+      <div style={{ display: "flex", gap: 4, marginBottom: 36, borderBottom: "1px solid #ecf0f1", paddingBottom: 0, flexWrap: "wrap" }}>
+        {tabs.map(t => (
+          <button key={t.key} onClick={() => setActiveTab(t.key)} style={{
+            background: "none", border: "none", borderBottom: activeTab === t.key ? "2px solid #1a2332" : "2px solid transparent",
+            padding: "12px 20px", cursor: "pointer", fontSize: 13, letterSpacing: 0.5,
+            color: activeTab === t.key ? "#1a2332" : "#95a5a6", fontFamily: "'DM Sans', sans-serif",
+            transition: "all 0.2s", fontWeight: activeTab === t.key ? 600 : 400,
+          }}>
+            <span style={{ marginRight: 6 }}>{t.icon}</span>{t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* OVERVIEW */}
+      {activeTab === "overview" && (
+        <div style={{ animation: "fadeUp 0.4s ease" }}>
+          {/* MOU Document Section */}
+          {mouData && (
+            <div style={{ marginBottom: 32, padding: 24, border: "1px solid #e8ecf0", background: "#fafbfc", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                <div style={{ width: 44, height: 44, background: "#1a2332", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 16 }}>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 2h8l4 4v12a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="#fff" strokeWidth="1.5" fill="none" /><path d="M12 2v4h4M7 10h6M7 13h6M7 16h3" stroke="#fff" strokeWidth="1.2" strokeLinecap="round" /></svg>
+                </div>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "#1a2332" }}>Signed Memorandum of Understanding</div>
+                  <div style={{ fontSize: 12, color: "#7f8c8d", marginTop: 2 }}>Signed by {mouData.inuniName} & {mouData.partnerName} — {mouData.date}</div>
+                </div>
+              </div>
+              <button onClick={() => setMouDownloaded(true)} style={{ background: mouDownloaded ? "#eafaf1" : "#1a2332", color: mouDownloaded ? "#1e8449" : "#fff", border: mouDownloaded ? "1px solid #d5f5e3" : "none", padding: "10px 24px", fontSize: 12, letterSpacing: 1, cursor: "pointer", textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif" }}>
+                {mouDownloaded ? "✓ Downloaded" : "Extract Copy"}
+              </button>
+            </div>
+          )}
+
+          {/* University Profile */}
+          {eoiData && (
+            <div style={{ marginBottom: 32, border: "1px solid #e8ecf0", overflow: "hidden" }}>
+              <div style={{ padding: "16px 24px", background: "#f7f9fb", borderBottom: "1px solid #e8ecf0" }}>
+                <div style={{ fontSize: 12, letterSpacing: 2, color: "#7f8c8d", textTransform: "uppercase" }}>University Profile</div>
+              </div>
+              <div style={{ padding: "28px 24px", display: "grid", gridTemplateColumns: "auto 1fr", gap: "0 32px", alignItems: "start" }}>
+                <div style={{ gridRow: "1 / 4", width: 64, height: 64, background: "#1a2332", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 22, fontFamily: "'Playfair Display', serif", fontWeight: 700 }}>
+                  {eoiData.institution?.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase()}
+                </div>
+                <div>
+                  <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, color: "#1a2332", margin: "0 0 16px 0" }}>{eoiData.institution}</h3>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px 40px" }}>
+                    <div>
+                      <div style={{ fontSize: 11, letterSpacing: 1.5, color: "#95a5a6", textTransform: "uppercase", marginBottom: 4 }}>Contact Person</div>
+                      <div style={{ fontSize: 14, color: "#2c3e50" }}>{eoiData.contact}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 11, letterSpacing: 1.5, color: "#95a5a6", textTransform: "uppercase", marginBottom: 4 }}>Email Address</div>
+                      <div style={{ fontSize: 14, color: "#2c3e50" }}>{eoiData.email}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 11, letterSpacing: 1.5, color: "#95a5a6", textTransform: "uppercase", marginBottom: 4 }}>City</div>
+                      <div style={{ fontSize: 14, color: "#2c3e50" }}>{eoiData.city}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 11, letterSpacing: 1.5, color: "#95a5a6", textTransform: "uppercase", marginBottom: 4 }}>Country</div>
+                      <div style={{ fontSize: 14, color: "#2c3e50" }}>{eoiData.country}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20, marginBottom: 40 }}>
+            {[
+              { label: "Students Referred", value: MOCK_REFERRALS.length, sub: "Total introductions", accent: "#1a5276" },
+              { label: "Enrolled", value: enrolled, sub: "Confirmed enrolments", accent: "#1e8449" },
+              { label: "Mobility Credits", value: tokenBalance, sub: `${TOKEN_VALUE} credits per enrolment`, accent: "#d4a017" },
+              { label: "Active Collaborations", value: 3, sub: "Partnership streams", accent: "#7d3c98" },
+            ].map((c, i) => (
+              <div key={i} style={{ padding: 28, background: "#fafbfc", border: "1px solid #e8ecf0", position: "relative", overflow: "hidden" }}>
+                <div style={{ position: "absolute", top: 0, left: 0, width: 3, height: "100%", background: c.accent }} />
+                <div style={{ fontSize: 12, letterSpacing: 2, color: "#7f8c8d", textTransform: "uppercase", marginBottom: 12 }}>{c.label}</div>
+                <div style={{ fontSize: 36, fontFamily: "'Playfair Display', serif", color: "#1a2332", fontWeight: 700, marginBottom: 4 }}><AnimatedNumber value={c.value} /></div>
+                <div style={{ fontSize: 12, color: "#95a5a6" }}>{c.sub}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ marginBottom: 40 }}>
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: "#1a2332", marginBottom: 20 }}>Referral Pipeline</h3>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              {[{ stage: 1, count: interested }, { stage: 2, count: offered }, { stage: 3, count: enrolled }].map((s, i) => (
+                <div key={i} style={{ flex: 1, display: "flex", alignItems: "center" }}>
+                  <div style={{ flex: 1, padding: 20, background: STAGES[s.stage].bg, borderLeft: i > 0 ? `3px solid ${STAGES[s.stage].color}` : "none", textAlign: "center" }}>
+                    <div style={{ fontSize: 28, fontFamily: "'Playfair Display', serif", color: STAGES[s.stage].color, fontWeight: 700 }}>{s.count}</div>
+                    <div style={{ fontSize: 12, letterSpacing: 1, color: STAGES[s.stage].color, textTransform: "uppercase", marginTop: 4 }}>{STAGES[s.stage].label}</div>
+                  </div>
+                  {i < 2 && <div style={{ fontSize: 18, color: "#bdc3c7", padding: "0 8px" }}>→</div>}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 18, color: "#1a2332", marginBottom: 20 }}>Collaboration Opportunities</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+            {COLLABORATION_TYPES.map(c => (
+              <div key={c.key} onClick={() => { setActiveTab("collaborate"); setSelectedCollab(c.key); }}
+                style={{ padding: 24, border: "1px solid #e8ecf0", cursor: "pointer", transition: "all 0.3s", background: "#fff" }}
+                onMouseOver={e => { e.currentTarget.style.borderColor = c.color; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                onMouseOut={e => { e.currentTarget.style.borderColor = "#e8ecf0"; e.currentTarget.style.transform = "none"; }}>
+                <div style={{ marginBottom: 12 }}>{renderCollabIcon(c.icon)}</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "#1a2332", marginBottom: 6 }}>{c.title}</div>
+                <div style={{ fontSize: 12, color: "#7f8c8d", lineHeight: 1.6 }}>{c.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* REFERRALS */}
+      {activeTab === "referrals" && (
+        <div style={{ animation: "fadeUp 0.4s ease" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, color: "#1a2332", margin: 0 }}>Student Referral Tracker</h3>
+            <div style={{ fontSize: 12, color: "#95a5a6" }}>Student names are anonymised for data protection</div>
+          </div>
+          <div style={{ border: "1px solid #e8ecf0", overflow: "hidden" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr 1.5fr 140px", background: "#f7f9fb", padding: "14px 24px", fontSize: 11, letterSpacing: 2, color: "#7f8c8d", textTransform: "uppercase", borderBottom: "1px solid #e8ecf0" }}>
+              <div>Student ID</div><div>Destination University</div><div>Date Referred</div><div>Stage</div>
+            </div>
+            {MOCK_REFERRALS.map((r, i) => {
+              const uni = UNIVERSITIES_WESTERN.find(u => u.id === r.university);
+              return (
+                <div key={i} style={{ display: "grid", gridTemplateColumns: "1fr 2fr 1.5fr 140px", padding: "16px 24px", fontSize: 14, color: "#2c3e50", borderBottom: i < MOCK_REFERRALS.length - 1 ? "1px solid #f0f3f5" : "none", background: i % 2 === 0 ? "#fff" : "#fdfdfe" }}>
+                  <div style={{ fontFamily: "monospace", fontSize: 13, color: "#5d6d7e" }}>{r.sid}</div>
+                  <div>{uni?.logo} {uni?.name}</div>
+                  <div style={{ color: "#7f8c8d" }}>{new Date(r.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</div>
+                  <div><span style={{ display: "inline-block", padding: "4px 14px", fontSize: 11, letterSpacing: 1, background: STAGES[r.stage].bg, color: STAGES[r.stage].color, border: `1px solid ${STAGES[r.stage].color}22`, textTransform: "uppercase" }}>{STAGES[r.stage].label}</span></div>
+                </div>
+              );
+            })}
+          </div>
+          <div style={{ marginTop: 32, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+            {Object.entries(STAGES).map(([k, v]) => {
+              const count = MOCK_REFERRALS.filter(r => r.stage === parseInt(k)).length;
+              return (<div key={k} style={{ padding: 20, background: v.bg, border: `1px solid ${v.color}22`, textAlign: "center" }}><div style={{ fontSize: 32, fontFamily: "'Playfair Display', serif", color: v.color, fontWeight: 700 }}>{count}</div><div style={{ fontSize: 12, color: v.color, letterSpacing: 1, textTransform: "uppercase", marginTop: 4 }}>{v.label}</div></div>);
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* MOBILITY CREDITS */}
+      {activeTab === "credits" && (
+        <CreditsTab tokenBalance={tokenBalance} enrolled={enrolled} />
+      )}
+
+      {/* COLLABORATE */}
+      {activeTab === "collaborate" && (
+        <div style={{ animation: "fadeUp 0.4s ease" }}>
+          <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, color: "#1a2332", marginBottom: 8 }}>Choose a Collaboration Area</h3>
+          <p style={{ fontSize: 13, color: "#7f8c8d", marginBottom: 28 }}>Select a collaboration type, then choose which western university you wish to partner with.</p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 32 }}>
+            {COLLABORATION_TYPES.map(c => (
+              <div key={c.key} onClick={() => setSelectedCollab(selectedCollab === c.key ? null : c.key)} style={{ padding: 20, cursor: "pointer", transition: "all 0.3s", border: selectedCollab === c.key ? `2px solid ${c.color}` : "1px solid #e8ecf0", background: selectedCollab === c.key ? c.color + "08" : "#fff" }}>
+                <div style={{ marginBottom: 8 }}>{renderCollabIcon(c.icon)}</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: c.color }}>{c.title}</div>
+              </div>
+            ))}
+          </div>
+          {selectedCollab && (
+            <div style={{ animation: "fadeUp 0.3s ease" }}>
+              <div style={{ fontSize: 12, letterSpacing: 2, color: "#7f8c8d", textTransform: "uppercase", marginBottom: 16 }}>Select a Western University to Collaborate With</div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+                {UNIVERSITIES_WESTERN.map(u => (
+                  <div key={u.id} style={{ padding: 20, border: "1px solid #e8ecf0", textAlign: "center", cursor: "pointer", transition: "all 0.3s" }}
+                    onMouseOver={e => { e.currentTarget.style.borderColor = "#1a5276"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                    onMouseOut={e => { e.currentTarget.style.borderColor = "#e8ecf0"; e.currentTarget.style.transform = "none"; }}>
+                    <div style={{ fontSize: 28, marginBottom: 8 }}>{u.logo}</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#1a2332", marginBottom: 4 }}>{u.name}</div>
+                    <div style={{ fontSize: 11, color: "#95a5a6" }}>{u.country}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TNE */}
+      {activeTab === "tne" && (
+        <div style={{ animation: "fadeUp 0.4s ease" }}>
+          <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, color: "#1a2332", marginBottom: 8 }}>Transnational Education Partnerships</h3>
+          <p style={{ fontSize: 13, color: "#7f8c8d", marginBottom: 28 }}>Select a western university, then choose the partnership model that suits your institution.</p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12, marginBottom: 32 }}>
+            {UNIVERSITIES_WESTERN.map(u => (
+              <div key={u.id} onClick={() => setSelectedUniForTNE(selectedUniForTNE === u.id ? null : u.id)} style={{ padding: 20, textAlign: "center", cursor: "pointer", transition: "all 0.3s", border: selectedUniForTNE === u.id ? "2px solid #1e8449" : "1px solid #e8ecf0", background: selectedUniForTNE === u.id ? "#eafaf1" : "#fff" }}>
+                <div style={{ fontSize: 24, marginBottom: 6 }}>{u.logo}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#1a2332" }}>{u.name}</div>
+                <div style={{ fontSize: 11, color: "#95a5a6" }}>{u.country}</div>
+              </div>
+            ))}
+          </div>
+          {selectedUniForTNE && (
+            <div style={{ animation: "fadeUp 0.3s ease" }}>
+              <div style={{ fontSize: 12, letterSpacing: 2, color: "#7f8c8d", textTransform: "uppercase", marginBottom: 16 }}>Choose Partnership Model with {UNIVERSITIES_WESTERN.find(u => u.id === selectedUniForTNE)?.name}</div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                {TNE_MODELS.map(m => {
+                  const isSelected = tneSelections[selectedUniForTNE] === m.id;
+                  return (
+                    <div key={m.id} onClick={() => setTneSelections({ ...tneSelections, [selectedUniForTNE]: isSelected ? null : m.id })} style={{ padding: 20, cursor: "pointer", transition: "all 0.3s", border: isSelected ? "2px solid #1e8449" : "1px solid #e8ecf0", background: isSelected ? "#eafaf1" : "#fff" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                        <div style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${isSelected ? "#1e8449" : "#bdc3c7"}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          {isSelected && <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#1e8449" }} />}
+                        </div>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: "#1a2332" }}>{m.label}</div>
+                      </div>
+                      <div style={{ fontSize: 12, color: "#7f8c8d", marginLeft: 28, lineHeight: 1.5 }}>{m.desc}</div>
+                    </div>
+                  );
+                })}
+              </div>
+              {tneSelections[selectedUniForTNE] && (
+                <div style={{ marginTop: 20, padding: 20, background: "#eafaf1", border: "1px solid #d5f5e3", textAlign: "center", animation: "fadeUp 0.3s ease" }}>
+                  <div style={{ fontSize: 13, color: "#1e8449", marginBottom: 8 }}>✓ Interest registered for <strong>{TNE_MODELS.find(m => m.id === tneSelections[selectedUniForTNE])?.label}</strong> with <strong>{UNIVERSITIES_WESTERN.find(u => u.id === selectedUniForTNE)?.name}</strong></div>
+                  <div style={{ fontSize: 12, color: "#7f8c8d" }}>INUNI will facilitate the matching and introduction process.</div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* SUPPORT / TICKETS */}
+      {activeTab === "support" && (
+        <SupportTab institution={institution} />
+      )}
+    </div>
+  );
+}
+
+// ─── SUPPORT TAB ──────────────────────────────────────────────
+const TICKET_CATEGORIES = [
+  { key: "general", label: "General Enquiry" },
+  { key: "referral", label: "Student Referral Query" },
+  { key: "credits", label: "Mobility Credits Query" },
+  { key: "tne", label: "TNE Partnership Query" },
+  { key: "technical", label: "Technical / Platform Issue" },
+  { key: "meeting", label: "Request a Meeting" },
+];
+
+const MOCK_TICKETS = [
+  { id: "TKT-2026-0012", subject: "Query regarding 2+2 pathway with Arden University", category: "tne", status: "open", createdAt: "2026-04-08", messages: [
+    { from: "partner", text: "We would like to understand the entry requirements for the 2+2 undergraduate pathway with Arden University for our Business Administration students. Could you arrange a call with the relevant team?", at: "8 Apr 2026, 09:30" },
+    { from: "inuni", text: "Thank you for your enquiry. We have forwarded your request to the Arden University partnerships team. A representative will be in touch within 48 hours to arrange a suitable time for a call.", at: "8 Apr 2026, 14:15" },
+  ]},
+  { id: "TKT-2026-0009", subject: "Student STU-2026-0102 offer status", category: "referral", status: "resolved", createdAt: "2026-03-25", messages: [
+    { from: "partner", text: "Student STU-2026-0102 was referred to University Canada West on 20 March. Could you provide an update on their application status?", at: "25 Mar 2026, 11:00" },
+    { from: "inuni", text: "The student has received a conditional offer from UCW as of 28 March. The referral stage has been updated to Received Offer on your dashboard.", at: "29 Mar 2026, 10:45" },
+  ]},
+  { id: "TKT-2026-0005", subject: "Request for partnership meeting \u2014 May 2026", category: "meeting", status: "resolved", createdAt: "2026-03-10", messages: [
+    { from: "partner", text: "We would like to request a virtual meeting with the INUNI partnerships team to discuss expanding our collaboration to include joint research opportunities. Preferred dates: 5\u20139 May 2026.", at: "10 Mar 2026, 08:00" },
+    { from: "inuni", text: "We would be delighted to arrange this. A calendar invitation for 7 May 2026 at 10:00 AM (GMT) has been sent to your registered email address.", at: "12 Mar 2026, 16:30" },
+  ]},
+];
+
+function SupportTab({ institution }) {
+  const [tickets, setTickets] = useState(MOCK_TICKETS);
+  const [viewingTicket, setViewingTicket] = useState(null);
+  const [creatingTicket, setCreatingTicket] = useState(false);
+  const [replyText, setReplyText] = useState("");
+  const [newSubject, setNewSubject] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [newMessage, setNewMessage] = useState("");
+
+  const handleCreateTicket = () => {
+    const ticket = {
+      id: `TKT-2026-${String(Math.floor(Math.random() * 900) + 100).padStart(4, "0")}`,
+      subject: newSubject, category: newCategory, status: "open",
+      createdAt: new Date().toISOString().split("T")[0],
+      messages: [{ from: "partner", text: newMessage, at: new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) }],
+    };
+    setTickets([ticket, ...tickets]);
+    setCreatingTicket(false); setViewingTicket(ticket.id);
+    setNewSubject(""); setNewCategory(""); setNewMessage("");
+  };
+
+  const handleReply = (ticketId) => {
+    if (!replyText.trim()) return;
+    setTickets(prev => prev.map(t => t.id === ticketId ? {
+      ...t, messages: [...t.messages, { from: "partner", text: replyText, at: new Date().toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) }]
+    } : t));
+    setReplyText("");
+  };
+
+  const activeTicket = tickets.find(t => t.id === viewingTicket);
+
+  // ─── Ticket detail view ───
+  if (activeTicket) {
+    return (
+      <div style={{ animation: "fadeUp 0.4s ease" }}>
+        <button onClick={() => setViewingTicket(null)} style={{ background: "none", border: "1px solid #dce1e6", padding: "6px 16px", fontSize: 12, color: "#7f8c8d", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", marginBottom: 24 }}>\u2190 Back to Tickets</button>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 28 }}>
+          <div>
+            <div style={{ fontSize: 11, color: "#95a5a6", letterSpacing: 1, marginBottom: 4 }}>{activeTicket.id} \u00b7 {TICKET_CATEGORIES.find(c => c.key === activeTicket.category)?.label}</div>
+            <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, color: "#1a2332", margin: 0 }}>{activeTicket.subject}</h3>
+          </div>
+          <span style={{ padding: "4px 14px", fontSize: 11, letterSpacing: 1, textTransform: "uppercase", background: activeTicket.status === "open" ? "#ebf5fb" : "#eafaf1", color: activeTicket.status === "open" ? "#2471a3" : "#1e8449", border: `1px solid ${activeTicket.status === "open" ? "#2471a322" : "#1e844922"}`, flexShrink: 0 }}>{activeTicket.status}</span>
+        </div>
+
+        <div style={{ display: "grid", gap: 16, marginBottom: 28 }}>
+          {activeTicket.messages.map((msg, i) => (
+            <div key={i} style={{ display: "flex", flexDirection: msg.from === "inuni" ? "row" : "row-reverse", gap: 12 }}>
+              <div style={{ width: 36, height: 36, borderRadius: "50%", background: msg.from === "inuni" ? "#1a2332" : "#e8ecf0", display: "flex", alignItems: "center", justifyContent: "center", color: msg.from === "inuni" ? "#fff" : "#5d6d7e", fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{msg.from === "inuni" ? "IN" : "You"}</div>
+              <div style={{ maxWidth: "75%", padding: "16px 20px", background: msg.from === "inuni" ? "#f7f9fb" : "#f0f7ff", border: `1px solid ${msg.from === "inuni" ? "#e8ecf0" : "#d0e3f7"}`, fontSize: 13.5, color: "#2c3e50", lineHeight: 1.7 }}>
+                <div style={{ marginBottom: 8 }}>{msg.text}</div>
+                <div style={{ fontSize: 11, color: "#95a5a6" }}>{msg.from === "inuni" ? "INUNI Partnerships Team" : institution} \u00b7 {msg.at}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {activeTicket.status === "open" && (
+          <div style={{ border: "1px solid #e8ecf0", padding: 20 }}>
+            <textarea value={replyText} onChange={e => setReplyText(e.target.value)} rows={3} placeholder="Type your reply..." style={{ width: "100%", padding: "12px 14px", border: "1px solid #dce1e6", fontSize: 14, color: "#1a2332", outline: "none", background: "#fff", fontFamily: "'DM Sans', sans-serif", boxSizing: "border-box", resize: "vertical", marginBottom: 12 }} />
+            <button onClick={() => handleReply(activeTicket.id)} disabled={!replyText.trim()} style={{ background: replyText.trim() ? "#1a2332" : "#bdc3c7", color: "#fff", border: "none", padding: "10px 28px", fontSize: 12, letterSpacing: 1, cursor: replyText.trim() ? "pointer" : "default", textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif" }}>Send Reply</button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ─── New ticket form ───
+  if (creatingTicket) {
+    const canSubmit = newSubject.trim() && newCategory && newMessage.trim();
+    return (
+      <div style={{ animation: "fadeUp 0.4s ease" }}>
+        <button onClick={() => setCreatingTicket(false)} style={{ background: "none", border: "1px solid #dce1e6", padding: "6px 16px", fontSize: 12, color: "#7f8c8d", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", marginBottom: 24 }}>\u2190 Back to Tickets</button>
+        <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, color: "#1a2332", marginBottom: 24 }}>New Support Ticket</h3>
+        <div style={{ border: "1px solid #e8ecf0", padding: 28 }}>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ fontSize: 11, letterSpacing: 1.5, color: "#7f8c8d", textTransform: "uppercase", display: "block", marginBottom: 6 }}>Category</label>
+            <select value={newCategory} onChange={e => setNewCategory(e.target.value)} style={{ width: "100%", padding: "11px 14px", border: "1px solid #dce1e6", fontSize: 14, color: newCategory ? "#1a2332" : "#95a5a6", outline: "none", background: "#fff", fontFamily: "'DM Sans', sans-serif", boxSizing: "border-box" }}>
+              <option value="">Select a category</option>
+              {TICKET_CATEGORIES.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}
+            </select>
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ fontSize: 11, letterSpacing: 1.5, color: "#7f8c8d", textTransform: "uppercase", display: "block", marginBottom: 6 }}>Subject</label>
+            <input value={newSubject} onChange={e => setNewSubject(e.target.value)} placeholder="Brief description of your enquiry" style={{ width: "100%", padding: "11px 14px", border: "1px solid #dce1e6", fontSize: 14, color: "#1a2332", outline: "none", background: "#fff", fontFamily: "'DM Sans', sans-serif", boxSizing: "border-box" }} />
+          </div>
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ fontSize: 11, letterSpacing: 1.5, color: "#7f8c8d", textTransform: "uppercase", display: "block", marginBottom: 6 }}>Message</label>
+            <textarea value={newMessage} onChange={e => setNewMessage(e.target.value)} rows={5} placeholder="Please provide as much detail as possible so our team can assist you effectively." style={{ width: "100%", padding: "12px 14px", border: "1px solid #dce1e6", fontSize: 14, color: "#1a2332", outline: "none", background: "#fff", fontFamily: "'DM Sans', sans-serif", boxSizing: "border-box", resize: "vertical" }} />
+          </div>
+          <button onClick={handleCreateTicket} disabled={!canSubmit} style={{ background: canSubmit ? "#1a2332" : "#bdc3c7", color: "#fff", border: "none", padding: "14px 40px", fontSize: 13, letterSpacing: 1.5, cursor: canSubmit ? "pointer" : "default", textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif" }}>Submit Ticket</button>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Ticket list ───
+  return (
+    <div style={{ animation: "fadeUp 0.4s ease" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
+        <div>
+          <h3 style={{ fontFamily: "'Playfair Display', serif", fontSize: 20, color: "#1a2332", margin: "0 0 4px" }}>Support & Enquiries</h3>
+          <p style={{ fontSize: 13, color: "#7f8c8d", margin: 0 }}>Log a question, request a meeting, or raise a support ticket with the INUNI Partnerships Team.</p>
+        </div>
+        <button onClick={() => setCreatingTicket(true)} style={{ background: "#1a2332", color: "#fff", border: "none", padding: "12px 28px", fontSize: 12, letterSpacing: 1, cursor: "pointer", textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif", whiteSpace: "nowrap" }}>+ New Ticket</button>
+      </div>
+      <div style={{ border: "1px solid #e8ecf0", overflow: "hidden" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "120px 1fr 150px 100px 80px", background: "#f7f9fb", padding: "12px 24px", fontSize: 11, letterSpacing: 2, color: "#7f8c8d", textTransform: "uppercase", borderBottom: "1px solid #e8ecf0" }}>
+          <div>Ticket ID</div><div>Subject</div><div>Category</div><div>Date</div><div>Status</div>
+        </div>
+        {tickets.map((t, i) => (
+          <div key={t.id} onClick={() => setViewingTicket(t.id)} style={{ display: "grid", gridTemplateColumns: "120px 1fr 150px 100px 80px", padding: "16px 24px", fontSize: 13, color: "#2c3e50", borderBottom: i < tickets.length - 1 ? "1px solid #f0f3f5" : "none", cursor: "pointer", transition: "background 0.2s", background: i % 2 === 0 ? "#fff" : "#fdfdfe" }}
+            onMouseOver={e => e.currentTarget.style.background = "#f7f9fb"} onMouseOut={e => e.currentTarget.style.background = i % 2 === 0 ? "#fff" : "#fdfdfe"}>
+            <div style={{ fontFamily: "monospace", fontSize: 12, color: "#5d6d7e" }}>{t.id}</div>
+            <div style={{ fontWeight: 500 }}>{t.subject}</div>
+            <div style={{ fontSize: 12, color: "#7f8c8d" }}>{TICKET_CATEGORIES.find(c => c.key === t.category)?.label}</div>
+            <div style={{ fontSize: 12, color: "#95a5a6" }}>{t.createdAt}</div>
+            <div><span style={{ padding: "3px 10px", fontSize: 10, letterSpacing: 1, textTransform: "uppercase", background: t.status === "open" ? "#ebf5fb" : "#eafaf1", color: t.status === "open" ? "#2471a3" : "#1e8449" }}>{t.status}</span></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── INUNI MESSAGE MODAL ───────────────────────────────────────
+const INUNI_MESSAGES = [
+  {
+    id: "msg1",
+    date: "12 April 2026",
+    subject: "Welcome to the INUNI Partner Dashboard",
+    body: "Dear Partner,\n\nWelcome to the INUNI Academic Intelligence platform. We are pleased to confirm that your institution has been successfully onboarded as an INUNI Global Partner.\n\nAs part of our commitment to fostering meaningful academic collaboration, we would like to draw your attention to the following:\n\n\u2022  Your dashboard now provides access to student referral tracking, academic mobility credits, and collaboration tools.\n\n\u2022  The INUNI Partnerships Team will be scheduling an introductory call within the next 10 business days to discuss your collaboration preferences and answer any questions.\n\n\u2022  Should you require assistance at any time, please use the Support tab to raise a ticket.\n\nWe look forward to a productive partnership.\n\nWarm regards,\nINUNI Partnerships Team",
+  },
+];
+
+function InuniMessageModal({ messages, onAcknowledge }) {
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const msg = messages[currentIdx];
+  const isLast = currentIdx === messages.length - 1;
+
+  return (
+    <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(26,35,50,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 1000, animation: "fadeUp 0.4s ease" }}>
+      <div style={{ background: "#fff", width: "100%", maxWidth: 620, maxHeight: "85vh", display: "flex", flexDirection: "column", boxShadow: "0 20px 60px rgba(0,0,0,0.15)" }}>
+        <div style={{ padding: "24px 32px", borderBottom: "1px solid #e8ecf0", display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
+          <div style={{ width: 36, height: 36, background: "#1a2332", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 12, fontWeight: 700, fontFamily: "'Playfair Display', serif", flexShrink: 0 }}>IN</div>
+          <div>
+            <div style={{ fontSize: 11, letterSpacing: 2, color: "#95a5a6", textTransform: "uppercase" }}>Message from INUNI</div>
+            <div style={{ fontSize: 15, fontWeight: 600, color: "#1a2332", marginTop: 2 }}>{msg.subject}</div>
+          </div>
+        </div>
+        <div style={{ padding: "28px 32px", overflowY: "auto", flex: 1 }}>
+          <div style={{ fontSize: 11, color: "#95a5a6", marginBottom: 16 }}>{msg.date}</div>
+          <div style={{ fontSize: 14, color: "#3d4f5f", lineHeight: 1.85, whiteSpace: "pre-wrap" }}>{msg.body}</div>
+        </div>
+        <div style={{ padding: "20px 32px", borderTop: "1px solid #e8ecf0", display: "flex", justifyContent: "space-between", alignItems: "center", flexShrink: 0 }}>
+          <div style={{ fontSize: 12, color: "#95a5a6" }}>{messages.length > 1 ? `Message ${currentIdx + 1} of ${messages.length}` : ""}</div>
+          <button onClick={() => { if (isLast) onAcknowledge(); else setCurrentIdx(currentIdx + 1); }}
+            style={{ background: "#1a2332", color: "#fff", border: "none", padding: "12px 32px", fontSize: 13, letterSpacing: 1, cursor: "pointer", textTransform: "uppercase", fontFamily: "'DM Sans', sans-serif" }}>
+            {isLast ? "Acknowledge & Continue" : "Next Message \u2192"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── STYLES ──────────────────────────────────────────────────
+const labelStyle = { display: "block", fontSize: 14, fontWeight: 600, color: "#2c3e50", marginBottom: 8 };
+const inputStyle = { width: "100%", padding: "12px 16px", border: "none", borderBottom: "1px solid #dce1e6", fontSize: 15, color: "#2c3e50", outline: "none", background: "transparent", fontFamily: "'DM Sans', sans-serif", boxSizing: "border-box", transition: "border-color 0.3s" };
+const sigInputStyle = { width: "100%", padding: "10px 14px", border: "1px solid #dce1e6", fontSize: 14, color: "#1a2332", outline: "none", background: "#fff", fontFamily: "'Playfair Display', serif", fontStyle: "italic", boxSizing: "border-box", transition: "border-color 0.3s" };
+
+// ─── MAIN APP ───────────────────────────────────────────────
+export default function INUNIPlatform() {
+  const [phase, setPhase] = useState("eoi");
+  const [institution, setInstitution] = useState("");
+  const [eoiData, setEoiData] = useState(null);
+  const [mouData, setMouData] = useState(null);
+  const [showMessages, setShowMessages] = useState(false);
+  const [messagesAcknowledged, setMessagesAcknowledged] = useState(false);
+
+  return (
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap');
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+        * { box-sizing: border-box; }
+        input:focus { border-bottom-color: #1a5276 !important; }
+        button:hover { opacity: 0.9; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #d0d5da; border-radius: 2px; }
+      `}</style>
+      <div style={{ fontFamily: "'DM Sans', sans-serif", minHeight: "100vh", background: "#ffffff", color: "#2c3e50" }}>
+        {/* Top Bar */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px 48px", borderBottom: "1px solid #e8ecf0" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <div style={{ width: 40, height: 40, background: "#1a2332", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 14, fontWeight: 700, fontFamily: "'Playfair Display', serif" }}>AI</div>
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 600, color: "#1a2332", letterSpacing: 1, lineHeight: 1.2 }}>INUNI</div>
+              <div style={{ fontSize: 10, letterSpacing: 2, color: "#95a5a6", textTransform: "uppercase", lineHeight: 1.2 }}>Academic Intelligence</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
+            {["eoi", "review", "mou", "dashboard"].map((p, i) => {
+              const phases = ["eoi", "review", "mou", "dashboard"];
+              const currentIdx = phases.indexOf(phase);
+              const thisIdx = phases.indexOf(p);
+              const isActive = phase === p;
+              const isCompleted = thisIdx < currentIdx;
+              return (
+                <div key={p} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ width: 24, height: 24, borderRadius: "50%", fontSize: 11, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", background: isActive ? "#1a2332" : isCompleted ? "#1e8449" : "#e8ecf0", color: isActive || isCompleted ? "#fff" : "#95a5a6" }}>{i + 1}</div>
+                  <div style={{ fontSize: 11, letterSpacing: 1, textTransform: "uppercase", color: isActive ? "#1a2332" : "#95a5a6" }}>
+                    {p === "eoi" ? "EOI" : p === "review" ? "Review" : p === "mou" ? "MOU" : "Dashboard"}
+                  </div>
+                  {i < 3 && <div style={{ width: 32, height: 1, background: "#e8ecf0", marginLeft: 8 }} />}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div style={{ maxWidth: 960, margin: "0 auto", padding: "48px 32px" }}>
+          {phase === "eoi" && <EOIForm onSubmit={form => { setInstitution(form.institution); setEoiData(form); setPhase("review"); }} />}
+          {phase === "review" && <ReviewPending institution={institution} onApprove={() => setPhase("mou")} />}
+          {phase === "mou" && <MOUSigning institution={institution} onSign={(data) => { setMouData(data); setShowMessages(true); setPhase("dashboard"); }} />}
+          {phase === "dashboard" && messagesAcknowledged && <Dashboard institution={institution} mouData={mouData} eoiData={eoiData} />}
+          {phase === "dashboard" && !messagesAcknowledged && (
+            <div style={{ textAlign: "center", padding: "80px 0", animation: "fadeUp 0.4s ease" }}>
+              <div style={{ fontSize: 40, marginBottom: 16 }}>🔒</div>
+              <p style={{ fontSize: 14, color: "#7f8c8d" }}>Please acknowledge the pending message from INUNI to access your dashboard.</p>
+            </div>
+          )}
+        </div>
+
+        <div style={{ padding: "24px 48px", borderTop: "1px solid #e8ecf0", display: "flex", justifyContent: "space-between", fontSize: 11, color: "#95a5a6" }}>
+          <div>© 2026 INUNI Academic Intelligence — A division of GUS Group</div>
+          <div style={{ letterSpacing: 2, textTransform: "uppercase" }}>Advancing Global Research Through Academic Intelligence</div>
+        </div>
+      </div>
+      {showMessages && !messagesAcknowledged && (
+        <InuniMessageModal messages={INUNI_MESSAGES} onAcknowledge={() => { setMessagesAcknowledged(true); setShowMessages(false); }} />
+      )}
+    </>
+  );
+}
