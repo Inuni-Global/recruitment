@@ -3269,6 +3269,28 @@ body{
   display.addEventListener('mouseenter', stop);
   display.addEventListener('mouseleave', () => { if (isAboutSlideActive()) start(); });
 
+  /* Force layout recalculation after fonts load — fixes GitHub Pages initial-render bug
+     where cycle-slide absolute positioning is computed before fonts settle, causing
+     body text to clip until the next layout pass triggers a recompute. */
+  function forceRelayout() {
+    const cards = display.querySelectorAll('.cycle-slide');
+    cards.forEach(c => {
+      /* Read offsetHeight to force a synchronous layout recalc */
+      void c.offsetHeight;
+    });
+    /* Trigger reflow on the container itself */
+    display.style.minHeight = display.offsetHeight + 'px';
+    requestAnimationFrame(() => { display.style.minHeight = ''; });
+  }
+
+  /* Run recalc after fonts are confirmed loaded */
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(forceRelayout);
+  }
+  /* Belt-and-suspenders: also run after a short delay to catch any slow-loading edge case */
+  setTimeout(forceRelayout, 500);
+  setTimeout(forceRelayout, 1500);
+
   /* Start if the about slide happens to be active at load */
   if (isAboutSlideActive()) start();
 })();
