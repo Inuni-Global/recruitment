@@ -32,10 +32,10 @@
 }
 
 html, body { height: 100%; }
-html { overflow-x: hidden; }
+html { overflow: hidden; }
 body {
-  overflow-x: hidden;
-  min-height: 100%;
+  overflow: hidden;
+  margin: 0;
 }
 
 body{
@@ -46,21 +46,38 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
-/* ===================== STAGE: fixed-canvas (page scrolls if window can't show it all) =====================
-   The stage is a fixed 900px-tall canvas. ALL relative positions are locked at this size:
-   topbar, slide content, bottom GUS bar maintain their exact spatial relationship regardless
-   of window size. If the window is shorter than 900px, the page scrolls. If the window is
-   taller, empty space appears below the canvas (deck stays anchored to the top of the viewport). */
-:root { --canvas-height: 900px; }
+/* The viewport is the actual browser window. The stage (canvas) is rendered inside
+   at fixed dimensions, then transformed via JS to fit. Background fills around it. */
+.viewport {
+  position: fixed;
+  inset: 0;
+  background: var(--light);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===================== STAGE: fixed-aspect design canvas ===================== */
+:root {
+  --canvas-width: 1440px;
+  --canvas-height: 900px;
+}
 
 .stage {
   position: relative;
-  width: 100%;
+  width: var(--canvas-width);
   height: var(--canvas-height);
+  flex-shrink: 0;
   display: grid;
   grid-template-rows: 1fr var(--gus-height);
   overflow: hidden;
   background: var(--light);
+  /* Scale applied via JS; transform-origin keeps canvas centred during scale */
+  transform-origin: center center;
+  transition: transform .15s ease-out;
+  /* Subtle definition between canvas and the surrounding flood */
+  box-shadow: 0 0 0 1px rgba(15,42,79,.08), 0 24px 80px -32px rgba(15,42,79,.18);
 }
 
 /* ===================== TOP BAR ===================== */
@@ -145,9 +162,9 @@ body{
   will-change: transform;
 }
 .slide {
-  width: 100vw;
+  width: var(--canvas-width);
   height: 100%;
-  flex: 0 0 100vw;
+  flex: 0 0 var(--canvas-width);
   position: relative;
   display: flex;
   align-items: center;
@@ -2102,7 +2119,8 @@ body{
 </head>
 <body>
 
-<div class="stage">
+<div class="viewport">
+<div class="stage" id="stage">
 
   <!-- ============ TOP BAR ============ -->
   <div class="topbar">
@@ -2932,8 +2950,44 @@ body{
   </aside>
 
 </div>
+</div>
 
 <script>
+/* ===== Canvas scale-to-fit =====
+   The stage is rendered at a fixed design size (1440x900). This IIFE applies a CSS
+   transform: scale() so the canvas always fills the available viewport while keeping
+   its aspect ratio. Recomputed on every window resize. */
+(function () {
+  const stage = document.getElementById('stage');
+  if (!stage) return;
+
+  function fit() {
+    const canvasW = parseInt(getComputedStyle(document.documentElement)
+      .getPropertyValue('--canvas-width')) || 1440;
+    const canvasH = parseInt(getComputedStyle(document.documentElement)
+      .getPropertyValue('--canvas-height')) || 900;
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    /* Pick the smaller scale to ensure both dimensions fit inside the viewport */
+    const scale = Math.min(vw / canvasW, vh / canvasH);
+    stage.style.transform = `scale(${scale})`;
+  }
+
+  fit();
+
+  /* Resize handling — debounced to avoid thrashing */
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(fit, 50);
+  });
+
+  /* Re-fit after fonts load (in case computed sizes shift) */
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(fit);
+  }
+})();
+
 (function () {
   const track = document.getElementById('track');
   const slides = Array.from(track.querySelectorAll('.slide'));
@@ -2947,10 +3001,13 @@ body{
   let parallaxProgress = 0; // 0..1 within current slide
 
   function applyTransform() {
-    /* Combine: slide offset + small parallax shift inside the active slide */
-    const slideOffset = -current * 100;
-    const innerShift = parallaxProgress * 4; // up to ~4vw of intra-slide drift
-    track.style.transform = `translate3d(calc(${slideOffset}vw - ${innerShift}vw), 0, 0)`;
+    /* Combine: slide offset + small parallax shift inside the active slide.
+       Each slide is var(--canvas-width) wide (1440px by default). */
+    const canvasWidth = parseInt(getComputedStyle(document.documentElement)
+      .getPropertyValue('--canvas-width')) || 1440;
+    const slideOffset = -current * canvasWidth;
+    const innerShift = parallaxProgress * canvasWidth * 0.04; // ~4% intra-slide drift
+    track.style.transform = `translate3d(${slideOffset - innerShift}px, 0, 0)`;
 
     /* Apply parallax to layers in the active slide */
     const active = slides[current];
