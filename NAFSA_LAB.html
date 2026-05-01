@@ -7,7 +7,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=block" rel="stylesheet">
 
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -31,10 +31,14 @@
   --gus-height: 180px;  /* persistent infrastructure block height */
 }
 
-/* 1. Change overflow to auto so the browser CAN scroll if needed */
-html, body { height: 100%; overflow: auto; }
+html, body { height: 100%; }
+html { overflow-x: hidden; }
+body {
+  overflow-x: hidden;
+  /* Canvas stays anchored to top; tall windows just show light background below it */
+  min-height: 100%;
+}
 
-/* Leave this middle block completely alone */
 body{
   font-family:var(--sans);
   background:var(--light);
@@ -43,17 +47,17 @@ body{
   -webkit-font-smoothing:antialiased;
 }
 
-/* ===================== STAGE: viewport-locked ===================== */
+/* ===================== STAGE: fixed-canvas (page scrolls if window can't show it all) =====================
+   The stage is a fixed 900px-tall canvas. ALL relative positions are locked at this size:
+   topbar, slide content, bottom GUS bar maintain their exact spatial relationship regardless
+   of window size. If the window is shorter than 900px, the page scrolls. If the window is
+   taller, empty space appears below the canvas (deck stays anchored to the top of the viewport). */
+:root { --canvas-height: 900px; }
+
 .stage {
-  /* 2. Remove "position: fixed" and "inset: 0" */
-  /* 3. Add these 5 lines below to give it a minimum height: */
   position: relative;
   width: 100%;
-  height: 100vh;
-  height: 100dvh;
-  min-height: 800px;
- 
-  /* Leave the rest of the stage settings exactly as they were: */
+  height: var(--canvas-height);
   display: grid;
   grid-template-rows: 1fr var(--gus-height);
   overflow: hidden;
