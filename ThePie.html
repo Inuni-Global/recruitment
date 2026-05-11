@@ -1,0 +1,2366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InUni Global × The PIE — Vision Brief</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Outfit:wght@300;400;500;600;700;800&display=block" rel="stylesheet">
+
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --light:#f4f5f7;
+  --light2:#ebedf1;
+  --light3:#dfe2e8;
+  --white:#fff;
+  --black:#0a0d12;
+  --text-dark:#2a3040;
+  --text-mid:#5a6275;
+  --text-light:#8890a4;
+  --text-muted:#8890a4;
+  --accent:#2d6fe0;
+  --accent2:#4a8df5;
+  --gus-navy:#0f2a4f;
+  --gold:#c9993a;
+  --border-light:rgba(0,0,0,.08);
+  --serif:'Cormorant Garamond',Georgia,serif;
+  --sans:'Outfit',-apple-system,sans-serif;
+  --gus-height:180px;
+}
+
+html,body{height:100%}
+html{overflow:hidden}
+body{
+  overflow:hidden;margin:0;
+  font-family:var(--sans);
+  background:var(--light);
+  color:var(--text-dark);
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ===== Viewport / Stage / Scale-to-fit ===== */
+.viewport{
+  position:fixed;inset:0;
+  background:var(--light);
+  overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+:root{ --canvas-width:1440px; --canvas-height:900px; }
+.stage{
+  position:relative;
+  width:var(--canvas-width);
+  height:var(--canvas-height);
+  flex-shrink:0;
+  display:grid;
+  grid-template-rows:1fr var(--gus-height);
+  overflow:hidden;
+  background:var(--light);
+  transform-origin:center center;
+  transition:transform .15s ease-out;
+  box-shadow:0 0 0 1px rgba(15,42,79,.08), 0 24px 80px -32px rgba(15,42,79,.18);
+}
+
+/* ===== Top Bar ===== */
+.topbar{
+  position:absolute;top:0;left:0;right:0;
+  height:72px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 3rem;z-index:100;pointer-events:none;
+}
+.topbar .brand{
+  font-family:var(--serif);font-size:1.4rem;font-weight:600;
+  letter-spacing:.02em;color:var(--black);
+}
+.topbar .brand b{color:var(--accent);font-weight:600}
+.topbar .crumbs{
+  display:flex;align-items:center;gap:1rem;
+  font-size:.6rem;font-weight:600;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--text-mid);
+  pointer-events:auto;
+}
+.topbar .crumbs span:first-child{color:var(--accent)}
+.topbar .progress{
+  display:flex;align-items:center;gap:.35rem;pointer-events:auto;
+}
+.topbar .progress button{
+  background:none;border:0;padding:6px 3px;cursor:pointer;display:block;
+}
+.topbar .progress .dot{
+  width:18px;height:2px;background:rgba(10,13,18,.18);
+  border-radius:2px;transition:background .4s, width .4s;
+}
+.topbar .progress button.active .dot{
+  background:var(--accent);width:30px;
+}
+
+/* ===== Slides Track ===== */
+.slides-area{position:relative;overflow:hidden}
+.slides-track{
+  position:absolute;inset:0;
+  display:flex;width:max-content;height:100%;
+  transition:transform 1.05s cubic-bezier(.77,0,.18,1);
+  will-change:transform;
+}
+.slide{
+  width:var(--canvas-width);
+  height:100%;
+  flex:0 0 var(--canvas-width);
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  padding:100px 8rem 4rem;
+  overflow:hidden;
+}
+
+/* Atmospheric backgrounds + noise */
+.slide-bg{
+  position:absolute;inset:0;z-index:0;pointer-events:none;
+}
+.slide-bg::after{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity:.035;mix-blend-mode:multiply;
+}
+.parallax-layer{
+  position:absolute;will-change:transform;pointer-events:none;
+}
+
+/* ===== Slide Inner ===== */
+.slide-inner{
+  position:relative;z-index:5;
+  width:100%;max-width:1280px;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:5rem;align-items:center;
+}
+.slide-inner.solo{
+  grid-template-columns:1fr;max-width:1280px;text-align:left;
+}
+
+.sec-label{
+  display:flex;align-items:center;gap:1.25rem;
+  font-size:.7rem;font-weight:700;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--accent);
+  margin-bottom:1.5rem;
+}
+.sec-label::before{
+  content:'';width:48px;height:1.5px;
+  background:var(--accent);flex-shrink:0;
+}
+
+.slide h1{
+  font-family:var(--serif);
+  font-size:clamp(2.4rem,5vw,4.6rem);
+  font-weight:500;line-height:1.05;
+  color:var(--black);margin-bottom:1.5rem;
+  letter-spacing:-.01em;
+}
+.slide h1 i{font-style:italic;color:var(--accent)}
+.slide h2{
+  font-family:var(--serif);
+  font-size:clamp(2rem,4vw,3.5rem);
+  font-weight:500;line-height:1.1;
+  color:var(--black);margin-bottom:1.25rem;
+  letter-spacing:-.01em;
+}
+.slide h2 i{font-style:italic;color:var(--accent)}
+.slide .lead{
+  font-size:1.05rem;color:var(--text-mid);
+  max-width:540px;line-height:1.75;
+}
+
+/* Reveal animations */
+.reveal{
+  opacity:0;transform:translateY(28px);
+  transition:opacity .9s ease, transform .9s cubic-bezier(.16,1,.3,1);
+}
+.slide.is-active .reveal{opacity:1;transform:translateY(0)}
+.slide.is-active .reveal.d1{transition-delay:.15s}
+.slide.is-active .reveal.d2{transition-delay:.3s}
+.slide.is-active .reveal.d3{transition-delay:.45s}
+.slide.is-active .reveal.d4{transition-delay:.6s}
+.slide.is-active .reveal.d5{transition-delay:.75s}
+.slide.is-active .reveal.d6{transition-delay:.9s}
+
+/* ===== Slide-specific layouts ===== */
+
+/* SLIDE 1 — Title hero (oversized headline + stats row) */
+.title-headline{
+  font-family:var(--sans);
+  font-weight:800;
+  font-size:clamp(3rem,7.5vw,6.6rem);
+  line-height:.92;letter-spacing:-.035em;
+  color:var(--black);text-transform:uppercase;
+}
+.title-headline span{color:var(--accent)}
+.title-stats{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-top:1px solid var(--border-light);
+  border-bottom:1px solid var(--border-light);
+  margin-top:2rem;
+}
+.title-stats .ps{
+  padding:1.4rem 1rem;text-align:left;
+  border-right:1px solid var(--border-light);
+}
+.title-stats .ps:last-child{border-right:0}
+.title-stats .ps strong{
+  display:block;font-family:var(--serif);
+  font-size:clamp(1.8rem,3vw,2.6rem);font-weight:600;
+  color:var(--black);line-height:1;letter-spacing:-.01em;
+}
+.title-stats .ps strong em{color:var(--accent);font-style:italic;font-weight:600}
+.title-stats .ps span{
+  font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--text-mid);font-weight:700;margin-top:.55rem;display:block;
+}
+.title-bg-mark{
+  top:6%;right:4%;
+  font-family:var(--serif);font-style:italic;font-weight:500;
+  font-size:24rem;line-height:1;letter-spacing:-.04em;
+  color:rgba(45,111,224,.045);
+}
+
+/* SLIDE 2 — about / who we are with cycling card */
+.about-bg-mark{
+  top:6%;right:18%;
+  font-family:var(--serif);font-style:italic;font-weight:500;
+  font-size:22rem;line-height:1;letter-spacing:-.04em;
+  color:rgba(45,111,224,.045);
+}
+.about-headline{
+  font-family:var(--serif);font-weight:500;
+  font-size:clamp(2.2rem,4.6vw,4.2rem);
+  line-height:1.04;letter-spacing:-.018em;
+  color:var(--black);max-width:14ch;margin-bottom:1.5rem;
+}
+.about-headline i{font-style:italic;font-weight:500;color:var(--accent)}
+.about-lead{
+  font-size:clamp(.9rem,1.05vw,1rem);
+  line-height:1.7;color:var(--text-mid);
+  max-width:62ch;margin-bottom:1.8rem;font-weight:400;
+}
+.about-lead strong{color:var(--text-dark);font-weight:500}
+.about-gus-strip{
+  display:flex;flex-direction:column;
+  padding:1.2rem 1.6rem;
+  background:var(--white);
+  border:1px solid var(--border-light);
+  border-left:3px solid var(--gus-navy);
+  margin-bottom:1.8rem;max-width:780px;
+}
+.about-gus-strip .ags-eyebrow{
+  font-family:var(--sans);font-size:.6rem;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--text-light);font-weight:500;
+  margin-bottom:.4rem;
+}
+.about-gus-strip .ags-line{
+  font-family:var(--serif);font-size:1.15rem;font-weight:500;
+  color:var(--gus-navy);line-height:1.4;font-style:italic;
+}
+.about-gus-strip .ags-line b{font-style:normal;font-weight:600}
+.about-grid{
+  display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);
+  gap:4rem;align-items:start;margin-top:1rem;
+}
+.about-col-left{min-width:0}
+.about-col-right{
+  min-width:0;position:relative;align-self:stretch;
+  display:flex;align-items:center;justify-content:center;
+  padding-top:1rem;
+}
+
+.cycle-display{
+  position:relative;width:100%;max-width:460px;
+  min-height:360px;padding:2.4rem 2.2rem 3.4rem;
+  background:var(--white);border:1px solid var(--border-light);
+  box-shadow:0 12px 48px -16px rgba(15,42,79,.18), 0 2px 8px -4px rgba(15,42,79,.08);
+  overflow:hidden;
+}
+.cycle-display .cycle-frame{
+  position:absolute;top:0;left:0;width:4px;height:100%;background:var(--accent);
+}
+.cycle-display .cycle-eyebrow{
+  font-family:var(--sans);font-size:.62rem;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--text-light);font-weight:500;
+  margin-bottom:1.6rem;
+}
+.cycle-slide{
+  position:absolute;top:4rem;left:2.2rem;right:2.2rem;bottom:3.2rem;
+  opacity:0;transform:translateY(12px);
+  transition:opacity .7s ease, transform .7s ease;
+  pointer-events:none;display:flex;flex-direction:column;
+}
+.cycle-slide.is-active{opacity:1;transform:translateY(0);pointer-events:auto}
+.cycle-slide .cs-roman{
+  font-family:var(--serif);font-style:italic;font-weight:500;
+  font-size:2.6rem;line-height:1;color:var(--accent);
+  letter-spacing:-.01em;margin-bottom:1rem;
+}
+.cycle-slide .cs-headline{
+  font-family:var(--serif);font-size:1.55rem;font-weight:600;
+  line-height:1.2;color:var(--black);margin-bottom:.85rem;
+  letter-spacing:-.008em;
+}
+.cycle-slide .cs-headline i{font-style:italic;font-weight:500;color:var(--accent)}
+.cycle-slide .cs-body{
+  font-size:.82rem;line-height:1.55;color:var(--text-mid);font-weight:400;
+}
+.cycle-display .cycle-dots{
+  position:absolute;left:2.2rem;bottom:1.4rem;
+  display:flex;gap:.45rem;z-index:3;
+}
+.cycle-display .cd-dot{
+  width:22px;height:2px;background:rgba(10,13,18,.18);
+  border:0;padding:0;cursor:pointer;
+  transition:background .35s, width .35s;
+}
+.cycle-display .cd-dot.is-active{background:var(--accent);width:36px}
+
+/* SLIDE 3 — Disciplines (5-up tools-grid pattern) */
+.tools-header{text-align:left;margin-bottom:1.5rem;max-width:900px}
+.tools-grid.five-up{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:.85rem;width:100%;
+}
+.tools-grid.five-up>.tool-card{grid-column:span 2}
+.tools-grid.five-up>.tool-card:nth-child(4){grid-column:2/span 2}
+.tools-grid.five-up>.tool-card:nth-child(5){grid-column:span 2}
+.tool-card{
+  background:#fff;border:1px solid var(--border-light);
+  border-radius:4px;padding:1.4rem 1.5rem;
+  display:flex;flex-direction:column;gap:.85rem;
+  transition:.3s;position:relative;overflow:hidden;
+}
+.tool-card:hover{border-color:var(--accent);box-shadow:0 14px 36px rgba(15,42,79,.08)}
+.tool-card::before{
+  content:'';position:absolute;top:0;left:0;
+  width:0;height:2px;background:var(--accent);
+  transition:width .5s ease;
+}
+.tool-card:hover::before{width:100%}
+.tool-card.compact{padding:1rem 1.1rem;gap:.5rem}
+.tool-card.compact .tool-head{
+  padding-bottom:.55rem;gap:.55rem;
+  flex-direction:column;align-items:flex-start;
+}
+.tool-head{
+  display:flex;justify-content:space-between;align-items:flex-start;
+  gap:1rem;border-bottom:1px solid var(--border-light);padding-bottom:.85rem;
+}
+.tool-id{
+  font-family:var(--serif);font-style:italic;
+  font-size:.7rem;font-weight:500;color:var(--text-mid);
+  letter-spacing:.14em;text-transform:uppercase;margin-bottom:.35rem;
+}
+.tool-card.compact .tool-id{font-size:.55rem;letter-spacing:.12em;margin-bottom:.15rem}
+.tool-head h4{
+  font-family:var(--serif);font-size:1.35rem;font-weight:500;
+  color:var(--black);letter-spacing:-.01em;line-height:1.1;
+}
+.tool-card.compact .tool-head h4{font-size:1rem}
+.tool-head h4 b{font-weight:600;color:var(--accent)}
+.tool-card.compact .tool-metric{
+  text-align:left;display:flex;align-items:baseline;gap:.5rem;
+  width:100%;border-top:1px dashed var(--border-light);padding-top:.45rem;
+}
+.tool-metric strong{
+  display:block;font-family:var(--serif);
+  font-size:1.4rem;font-weight:600;color:var(--black);
+  line-height:1;letter-spacing:-.01em;
+}
+.tool-card.compact .tool-metric strong{font-size:1rem}
+.tool-metric strong em{color:var(--accent);font-style:normal}
+.tool-metric span{
+  font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text-mid);font-weight:600;margin-top:.3rem;display:block;
+}
+.tool-card.compact .tool-metric span{font-size:.48rem;margin-top:0}
+.tool-body{font-size:.78rem;color:var(--text-mid);line-height:1.55}
+.tool-card.compact .tool-body{font-size:.7rem}
+.tb-row{display:flex;gap:.9rem;margin-bottom:.55rem}
+.tool-card.compact .tb-row{margin-bottom:.3rem;gap:.5rem}
+.tb-row:last-child{margin-bottom:0}
+.tb-key{
+  font-size:.55rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--text-light);font-weight:700;flex-shrink:0;
+  width:60px;padding-top:.15rem;
+}
+.tool-card.compact .tb-key{font-size:.48rem;letter-spacing:.14em;width:44px}
+.tb-val{flex:1}
+.tb-val .b-headline{
+  color:var(--black);font-weight:500;font-size:.82rem;margin-bottom:.25rem;
+}
+.tool-card.compact .b-headline{font-size:.72rem;margin-bottom:.18rem;line-height:1.35}
+.tool-body ul{list-style:none;padding:0;margin:0}
+.tool-body li{
+  position:relative;padding-left:.9rem;margin-bottom:.25rem;
+  font-size:.76rem;color:var(--text-mid);
+}
+.tool-card.compact li{
+  font-size:.66rem;margin-bottom:.15rem;padding-left:.7rem;line-height:1.35;
+}
+.tool-body li::before{
+  content:'—';position:absolute;left:0;color:var(--accent);
+}
+.tool-foot{
+  margin-top:auto;padding:.55rem .85rem;
+  border-left:2px solid var(--accent);
+  font-size:.72rem;color:var(--black);
+  font-style:italic;font-family:var(--serif);font-weight:500;
+  background:rgba(45,111,224,.04);border-radius:0 3px 3px 0;
+}
+.tool-card.compact .tool-foot{font-size:.62rem;padding:.4rem .65rem;line-height:1.3}
+
+/* Content-slide tightening (reused from NAFSA) */
+.slide.content-slide,.slide.tools-slide{
+  align-items:flex-start;padding-top:90px;padding-bottom:1.5rem;overflow-y:auto;
+}
+.slide.content-slide .slide-inner,.slide.tools-slide .slide-inner{align-self:flex-start}
+.slide.content-slide h2,.slide.tools-slide h2{
+  font-size:clamp(1.5rem,2.8vw,2.2rem);
+  margin-bottom:.5rem;line-height:1.1;
+}
+.slide.content-slide .lead,.slide.tools-slide .lead{
+  font-size:.85rem;line-height:1.5;margin-bottom:1rem;max-width:760px;
+}
+
+/* SLIDE 4 — B2C Journey: 6-step method-grid */
+.method-grid-6{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:.85rem;
+  margin-top:1.25rem;width:100%;
+}
+.method-card{
+  background:#fff;border:1px solid var(--border-light);
+  border-radius:4px;padding:1.25rem 1.1rem;
+  position:relative;transition:.3s;
+  display:flex;flex-direction:column;
+}
+.method-card:hover{
+  transform:translateY(-3px);border-color:var(--accent);
+  box-shadow:0 12px 32px rgba(15,42,79,.08);
+}
+.method-card .m-bars{display:flex;gap:3px;margin-bottom:1rem}
+.method-card .m-bars i{
+  width:4px;height:18px;background:var(--accent);
+  display:block;opacity:.85;
+}
+.method-card .m-num{
+  font-family:var(--serif);font-style:italic;
+  font-size:.7rem;font-weight:600;color:var(--text-mid);
+  letter-spacing:.15em;margin-bottom:.55rem;text-transform:uppercase;
+}
+.method-card h5{
+  font-family:var(--serif);font-size:1.05rem;font-weight:600;
+  color:var(--black);line-height:1.2;margin-bottom:.55rem;
+  letter-spacing:-.005em;
+}
+.method-card h5 i{font-style:italic;color:var(--accent);font-weight:500}
+.method-card p{
+  font-size:.72rem;color:var(--text-mid);line-height:1.55;
+}
+.method-principle{
+  display:flex;align-items:baseline;gap:1.25rem;
+  margin-top:1.4rem;padding-top:1.1rem;
+  border-top:1px solid var(--border-light);
+}
+.method-principle .mp-tag{
+  font-family:var(--sans);font-size:.62rem;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--text-light);font-weight:500;
+  flex-shrink:0;white-space:nowrap;
+}
+.method-principle .mp-line{
+  font-family:var(--serif);font-size:1.05rem;line-height:1.4;
+  color:var(--text-dark);font-weight:400;
+}
+.method-principle .mp-line b{font-weight:600;color:var(--black)}
+.method-principle .mp-line i{font-style:italic;color:var(--accent);font-weight:500}
+
+/* SLIDE 5 — Student-side ecosystem (3x2 tools) */
+.tools-grid.three-up{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;width:100%;
+}
+
+/* SLIDE 6 — AIE: outcomes-table-style row pattern */
+.outcomes-table{
+  width:100%;background:#fff;
+  border:1px solid var(--border-light);
+  border-radius:4px;overflow:hidden;
+}
+.outcomes-table .ot-row{
+  display:grid;grid-template-columns:60px 1fr 1.5fr 1.2fr;
+  align-items:center;padding:.55rem 1.25rem;
+  border-bottom:1px solid var(--border-light);gap:1rem;
+}
+.outcomes-table .ot-row:last-child{border-bottom:0}
+.outcomes-table .ot-row.head{background:var(--light2);padding:.5rem 1.25rem}
+.outcomes-table .ot-row.head>*{
+  font-size:.52rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--text-mid);font-weight:700;
+}
+.outcomes-table .ot-id{
+  font-family:var(--serif);font-style:italic;font-size:.8rem;
+  color:var(--text-light);font-weight:500;
+}
+.outcomes-table .ot-metric{
+  font-family:var(--serif);font-size:1.2rem;font-weight:600;
+  color:var(--black);line-height:1;letter-spacing:-.01em;
+}
+.outcomes-table .ot-metric em{color:var(--accent);font-style:normal}
+.outcomes-table .ot-metric small{
+  font-family:var(--sans);font-size:.6rem;font-weight:500;
+  color:var(--text-mid);text-transform:uppercase;
+  letter-spacing:.1em;margin-left:.2rem;
+}
+.outcomes-table .ot-outcome{
+  font-size:.76rem;color:var(--black);font-weight:500;line-height:1.35;
+}
+.outcomes-table .ot-orig{
+  font-size:.7rem;color:var(--text-mid);line-height:1.35;
+}
+
+/* AIE big number row */
+.aie-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  border-top:1px solid var(--border-light);
+  border-bottom:1px solid var(--border-light);
+  margin:1.5rem 0;
+}
+.aie-stats .as{
+  padding:1.2rem 1.25rem;text-align:left;
+  border-right:1px solid var(--border-light);
+}
+.aie-stats .as:last-child{border-right:0}
+.aie-stats .as strong{
+  display:block;font-family:var(--serif);font-size:2.4rem;
+  font-weight:600;color:var(--black);line-height:1;
+  letter-spacing:-.02em;
+}
+.aie-stats .as strong em{color:var(--accent);font-style:italic;font-weight:600}
+.aie-stats .as span{
+  font-size:.58rem;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--text-mid);font-weight:700;
+  margin-top:.55rem;display:block;
+}
+
+/* SLIDE 7 — Network map */
+.network-canvas{
+  position:relative;width:100%;
+  height:520px;
+  display:grid;place-items:center;margin-top:1rem;
+}
+.network-hub{
+  position:relative;width:520px;height:520px;
+}
+.network-hub .glow{
+  position:absolute;inset:30%;border-radius:50%;
+  background:radial-gradient(circle,rgba(45,111,224,.22),transparent 70%);
+  filter:blur(20px);
+}
+.network-hub .ring{
+  position:absolute;inset:30%;border-radius:50%;
+  border:1px solid rgba(45,111,224,.25);
+}
+.network-hub .ring.r2{inset:18%;border-color:rgba(45,111,224,.16)}
+.network-hub .ring.r3{inset:6%;border-color:rgba(45,111,224,.10)}
+.network-hub .core{
+  position:absolute;inset:36%;border-radius:50%;
+  background:linear-gradient(135deg,var(--gus-navy),var(--accent));
+  box-shadow:0 0 0 6px rgba(255,255,255,.95), 0 30px 60px -20px rgba(45,111,224,.5);
+  display:grid;place-items:center;text-align:center;color:#fff;
+}
+.network-hub .core .hw{
+  font-family:var(--serif);font-size:1.5rem;font-weight:600;
+  letter-spacing:.18em;line-height:1;
+}
+.network-hub .core .hs{
+  font-family:var(--sans);font-size:.5rem;font-weight:600;
+  letter-spacing:.22em;text-transform:uppercase;
+  color:rgba(255,255,255,.85);margin-top:.4rem;
+}
+.network-conn{position:absolute;inset:0;pointer-events:none}
+.network-conn line{stroke:rgba(45,111,224,.28);stroke-width:1;stroke-dasharray:3 5}
+.network-node{
+  position:absolute;width:64px;height:64px;border-radius:50%;
+  background:#fff;border:1px solid var(--border-light);
+  display:grid;place-items:center;
+  transform:translate(-50%,-50%);
+  transition:.3s;
+  box-shadow:0 6px 16px rgba(15,42,79,.08);
+}
+.network-node:hover{border-color:var(--accent);transform:translate(-50%,-50%) scale(1.08)}
+.network-node svg{width:26px;height:26px;color:var(--text-dark)}
+.network-node .nlabel{
+  position:absolute;font-family:var(--sans);
+  font-size:.62rem;font-weight:700;color:var(--text-dark);
+  text-transform:uppercase;letter-spacing:.12em;white-space:nowrap;
+}
+
+/* SLIDE 8 — Why this matters / Why The PIE: philo-grid */
+.philo-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1rem;margin-top:1.5rem;
+}
+.philo-card{
+  background:#fff;border:1px solid var(--border-light);
+  border-radius:4px;padding:1.6rem 1.4rem;position:relative;
+  transition:.3s;display:flex;flex-direction:column;
+}
+.philo-card:hover{
+  border-color:var(--accent);
+  box-shadow:0 12px 32px rgba(15,42,79,.08);transform:translateY(-2px);
+}
+.philo-card .p-tag{
+  font-family:var(--serif);font-style:italic;font-size:.7rem;
+  font-weight:600;letter-spacing:.14em;color:var(--accent);
+  margin-bottom:1.5rem;padding-bottom:.75rem;
+  border-bottom:1px solid var(--border-light);
+}
+.philo-card h5{
+  font-family:var(--serif);font-size:1.2rem;font-weight:500;
+  color:var(--black);line-height:1.2;margin-bottom:.85rem;
+  letter-spacing:-.005em;
+}
+.philo-card h5 i{font-style:italic;color:var(--accent);font-weight:500}
+.philo-card p{
+  font-size:.8rem;color:var(--text-mid);line-height:1.6;
+}
+.why-pie-strip{
+  margin-top:1.5rem;padding:1.2rem 1.6rem;
+  background:var(--white);border:1px solid var(--border-light);
+  border-left:3px solid var(--accent);
+  display:grid;grid-template-columns:auto 1fr;
+  gap:1.5rem;align-items:center;
+}
+.why-pie-strip .wp-tag{
+  font-family:var(--sans);font-size:.6rem;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--accent);font-weight:600;
+  white-space:nowrap;
+}
+.why-pie-strip .wp-line{
+  font-family:var(--serif);font-style:italic;font-size:1.1rem;
+  color:var(--text-dark);line-height:1.45;font-weight:400;
+}
+.why-pie-strip .wp-line i{color:var(--accent);font-style:italic;font-weight:500}
+
+/* SLIDE 9 — Convocation: ticket + vision pillars */
+.convo-grid{
+  display:grid;grid-template-columns:1fr 1.2fr;gap:2.5rem;
+  align-items:start;width:100%;
+}
+.convo-ticket{
+  background:var(--gus-navy);color:#fff;
+  padding:2rem 2rem 1.6rem;
+  border:1px solid var(--gus-navy);position:relative;
+  display:flex;flex-direction:column;gap:.5rem;
+  border-radius:4px;
+  box-shadow:0 18px 50px -20px rgba(15,42,79,.4);
+}
+.convo-ticket::before{
+  content:'';position:absolute;top:0;left:0;right:0;
+  height:3px;background:var(--gold);
+}
+.convo-ticket .ct-eyebrow{
+  font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--gold);font-weight:700;
+}
+.convo-ticket .ct-title{
+  font-family:var(--serif);font-style:italic;font-weight:500;
+  font-size:1.2rem;color:rgba(255,255,255,.85);margin-bottom:.6rem;
+}
+.convo-ticket .ct-date{
+  font-family:var(--serif);font-weight:400;
+  font-size:6rem;line-height:.85;letter-spacing:-.03em;
+  color:#fff;margin:.6rem 0 .4rem;
+}
+.convo-ticket .ct-date i{font-style:italic;color:var(--gold);font-weight:300}
+.convo-ticket .ct-dline{
+  font-size:.65rem;letter-spacing:.3em;color:var(--gold);font-weight:700;
+}
+.convo-ticket .ct-rule{
+  height:1px;background:rgba(255,255,255,.15);
+  margin:1.2rem 0 .9rem;border-top:1px dashed rgba(255,255,255,.2);background:transparent;
+}
+.convo-ticket .ct-by{
+  font-family:var(--serif);font-style:italic;font-size:1rem;
+  color:rgba(255,255,255,.92);
+}
+.convo-ticket .ct-aud{
+  font-size:.65rem;color:rgba(255,255,255,.65);
+  letter-spacing:.05em;line-height:1.4;
+}
+.convo-ticket .ct-culm{
+  margin-top:auto;background:var(--gold);color:var(--gus-navy);
+  padding:.85rem 1rem;display:flex;flex-direction:column;gap:.2rem;
+  border-radius:2px;
+}
+.convo-ticket .ct-culm span{
+  font-size:.55rem;letter-spacing:.32em;font-weight:700;text-transform:uppercase;
+}
+.convo-ticket .ct-culm b{
+  font-family:var(--serif);font-style:italic;font-size:1rem;font-weight:600;
+}
+
+.vision-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:.85rem;
+  margin-top:1rem;
+}
+.vision-card{
+  background:#fff;border:1px solid var(--border-light);
+  border-radius:4px;padding:1.2rem 1.2rem;
+  display:flex;flex-direction:column;gap:.4rem;
+  transition:.3s;
+}
+.vision-card:hover{
+  border-color:var(--accent);
+  box-shadow:0 12px 32px rgba(15,42,79,.08);transform:translateY(-2px);
+}
+.vision-card .v-tag{
+  font-family:var(--serif);font-style:italic;font-size:.65rem;
+  font-weight:600;letter-spacing:.14em;color:var(--accent);
+}
+.vision-card h5{
+  font-family:var(--serif);font-size:1.1rem;font-weight:600;
+  color:var(--black);line-height:1.2;
+}
+.vision-card h5 i{font-style:italic;color:var(--accent);font-weight:500}
+.vision-card p{
+  font-size:.72rem;color:var(--text-mid);line-height:1.5;
+}
+.the-ask{
+  margin-top:1rem;
+  background:var(--black);color:#fff;
+  padding:.85rem 1.1rem;border-radius:3px;
+  display:flex;align-items:center;gap:1rem;
+}
+.the-ask .ask-tag{
+  font-size:.55rem;letter-spacing:.32em;text-transform:uppercase;
+  color:var(--accent2);font-weight:700;white-space:nowrap;
+}
+.the-ask .ask-line{
+  font-family:var(--serif);font-style:italic;font-size:.95rem;
+  color:#fff;font-weight:400;
+}
+
+/* SLIDE 10 — Invitation faithful reproduction */
+.invite-canvas{
+  background:var(--gus-navy);color:#fff;
+  width:100%;height:100%;position:relative;
+  display:flex;align-items:center;justify-content:center;
+  padding:3rem;
+}
+.invite-canvas::before{
+  content:'';position:absolute;inset:1.6rem;
+  border:1px solid rgba(201,153,58,.4);pointer-events:none;
+}
+.invite-grid{
+  display:grid;grid-template-columns:1fr 1px 1fr;gap:0;
+  width:100%;max-width:1180px;align-items:center;
+}
+.invite-divider{
+  background:rgba(201,153,58,.3);height:80%;
+  align-self:center;justify-self:center;width:1px;
+}
+.invite-left{padding:0 3rem;text-align:center}
+.invite-right{padding:0 3rem}
+.invite-stars{
+  font-family:var(--serif);color:var(--gold);
+  letter-spacing:.5em;font-size:1rem;margin-bottom:2rem;
+}
+.invite-wordmark{
+  font-family:var(--serif);font-size:3.8rem;font-weight:300;
+  letter-spacing:.22em;color:#fff;margin-bottom:.8rem;
+}
+.invite-sub{
+  font-family:var(--sans);font-size:.65rem;letter-spacing:.32em;
+  text-transform:uppercase;color:var(--gold);font-weight:600;
+}
+.invite-rule{
+  width:50px;height:1px;background:var(--gold);
+  margin:1.5rem auto;
+}
+.invite-req{
+  font-family:var(--serif);font-style:italic;font-weight:400;
+  font-size:1rem;color:rgba(255,255,255,.7);margin-bottom:1.2rem;
+}
+.invite-title{
+  font-family:var(--serif);font-weight:400;font-size:2.6rem;
+  line-height:1.1;color:#fff;letter-spacing:-.005em;
+}
+.invite-title i{color:var(--gold);font-style:italic;font-weight:400}
+.invite-date{
+  font-family:var(--sans);font-size:.85rem;letter-spacing:.4em;
+  color:var(--gold);margin-top:3rem;font-weight:600;
+}
+.invite-loc{
+  font-family:var(--serif);font-style:italic;font-size:.95rem;
+  color:rgba(255,255,255,.7);margin-top:.6rem;
+}
+.invite-right h6{
+  font-family:var(--sans);font-size:.6rem;letter-spacing:.32em;
+  text-transform:uppercase;color:var(--gold);font-weight:600;margin-bottom:.6rem;
+}
+.invite-right p{
+  font-family:var(--serif);font-style:italic;font-weight:400;
+  font-size:.85rem;line-height:1.6;color:rgba(255,255,255,.78);
+  margin-bottom:1.2rem;
+}
+.invite-right p.formal{
+  font-style:normal;color:#fff;font-family:var(--serif);font-weight:500;
+}
+.invite-right .end-rule{
+  border-top:1px solid rgba(201,153,58,.3);
+  margin-top:1.4rem;padding-top:1rem;
+}
+.invite-right .end-rsvp{
+  font-family:var(--serif);font-style:italic;font-size:.85rem;
+  color:rgba(255,255,255,.78);margin-bottom:.5rem;
+}
+.invite-right .end-rsvp em{
+  font-style:normal;font-family:var(--sans);font-size:.55rem;
+  letter-spacing:.32em;color:var(--gold);font-weight:600;
+}
+.invite-right .end-email{
+  font-family:var(--sans);font-size:.95rem;font-weight:600;color:#fff;
+}
+
+/* SLIDE 11 — Closing: hero "together" */
+.close-stage{
+  width:100%;display:flex;flex-direction:column;
+  justify-content:center;align-items:flex-start;
+  text-align:left;max-width:1180px;margin:0 auto;
+}
+.close-italic{
+  font-family:var(--serif);font-style:italic;font-weight:400;
+  font-size:clamp(1.4rem,2.4vw,2rem);color:var(--text-mid);
+  margin-bottom:.5rem;
+}
+.close-mega{
+  font-family:var(--serif);font-weight:500;
+  font-size:clamp(5rem,11vw,11rem);line-height:.92;
+  letter-spacing:-.04em;color:var(--black);
+}
+.close-mega i{color:var(--accent);font-style:italic}
+.close-meta{
+  margin-top:3rem;display:grid;grid-template-columns:repeat(3,auto);
+  gap:3rem;font-size:.62rem;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--text-mid);font-weight:600;
+}
+.close-meta b{
+  display:block;color:var(--black);font-weight:600;
+  margin-bottom:.4rem;font-size:.6rem;
+}
+
+/* ===== Persistent GUS Bar (lifted from NAFSA verbatim) ===== */
+.gus-bar{
+  background:#fff;border-top:1px solid var(--border-light);
+  display:grid;grid-template-rows:auto 1fr auto;
+  position:relative;z-index:50;
+  box-shadow:0 -16px 40px rgba(15,42,79,.05);
+}
+.gus-bar .gus-cobrand{
+  display:flex;align-items:center;gap:1.25rem;
+  padding:.55rem 3rem;
+  border-bottom:1px solid var(--border-light);
+  background:var(--light);flex-wrap:wrap;
+}
+.gus-bar .ecb-label{
+  font-size:.52rem;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--text-mid);font-weight:700;
+}
+.gus-bar .ecb-divider{width:1px;height:14px;background:var(--border-light)}
+.gus-bar .ecb-mark{font-size:.78rem;font-weight:600;color:var(--black)}
+.gus-bar .ecb-mark b{color:var(--accent);font-weight:600}
+.gus-bar .ecb-arrow{
+  margin-left:auto;font-size:.62rem;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--accent);font-weight:600;
+  display:inline-flex;align-items:center;gap:.4rem;
+  transition:.3s;text-decoration:none;
+}
+.gus-bar .ecb-arrow:hover{transform:translateX(3px)}
+.gus-bar .eco-stats{
+  display:grid;grid-template-columns:repeat(6,1fr);
+  gap:0;padding:0 3rem;
+}
+.gus-bar .eco-s{
+  padding:.65rem .5rem;text-align:center;
+  border-right:1px solid var(--border-light);position:relative;
+}
+.gus-bar .eco-s:last-child{border-right:0}
+.gus-bar .eco-s strong{
+  display:block;font-family:var(--serif);
+  font-size:1.3rem;font-weight:600;color:var(--black);line-height:1;
+}
+.gus-bar .eco-s span{
+  font-size:.52rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text-mid);font-weight:600;margin-top:.25rem;display:block;
+}
+.ticker-wrap{
+  overflow:hidden;position:relative;
+  border-top:1px solid var(--border-light);
+  background:var(--light);
+}
+.ticker-wrap::before,.ticker-wrap::after{
+  content:'';position:absolute;top:0;bottom:0;width:100px;
+  z-index:2;pointer-events:none;
+}
+.ticker-wrap::before{background:linear-gradient(90deg,var(--light),transparent);left:0}
+.ticker-wrap::after{background:linear-gradient(270deg,var(--light),transparent);right:0}
+.ticker{
+  display:flex;gap:2.5rem;
+  animation:scrollT 50s linear infinite;
+  width:max-content;padding:.55rem 0;
+}
+.ticker span{
+  font-size:.6rem;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--text-mid);white-space:nowrap;
+}
+@keyframes scrollT{
+  from{transform:translateX(0)}
+  to{transform:translateX(-50%)}
+}
+
+/* ===== Programme slides (Day One / Day Two) ===== */
+.programme-slide{
+  background:#fbf6e8;  /* cream paper, slightly warmer than --light */
+}
+.programme-slide .slide-bg::after{opacity:.025}
+.programme-day-eyebrow{
+  font-family:var(--sans);font-size:.65rem;letter-spacing:.32em;
+  text-transform:uppercase;color:var(--gold);font-weight:700;
+  text-align:center;margin-bottom:.6rem;
+}
+.programme-date{
+  font-family:var(--serif);font-weight:500;
+  font-size:clamp(2rem,3.6vw,2.8rem);
+  text-align:center;color:var(--gus-navy);
+  letter-spacing:-.01em;line-height:1.1;
+  margin-bottom:.5rem;
+}
+.programme-strapline{
+  font-family:var(--serif);font-style:italic;font-weight:400;
+  font-size:.95rem;color:var(--gold);
+  text-align:center;letter-spacing:.04em;
+  margin-bottom:1rem;
+}
+.programme-strapline span{color:var(--gold);opacity:.7;margin:0 .4em}
+.programme-list{
+  width:100%;max-width:1140px;margin:0 auto;
+  border-top:1px solid rgba(201,153,58,.35);
+}
+.programme-row{
+  display:grid;grid-template-columns:90px 1fr;
+  align-items:start;
+  padding:.55rem 0;
+  border-bottom:1px solid rgba(201,153,58,.22);
+  position:relative;
+}
+.programme-row::before{
+  content:'';position:absolute;
+  left:90px;top:.55rem;bottom:.55rem;
+  width:1px;background:rgba(201,153,58,.5);
+}
+.programme-time{
+  font-family:var(--sans);font-weight:600;
+  font-size:.78rem;letter-spacing:.04em;
+  color:var(--gold);
+  padding-top:.05rem;
+}
+.programme-content{
+  padding-left:1.5rem;
+}
+.programme-title{
+  font-family:var(--serif);font-weight:600;
+  font-size:1.05rem;color:var(--gus-navy);
+  letter-spacing:-.005em;line-height:1.2;
+  margin-bottom:.2rem;
+}
+.programme-desc{
+  font-family:var(--serif);font-style:italic;font-weight:400;
+  font-size:.78rem;line-height:1.4;
+  color:rgba(15,42,79,.72);
+}
+.programme-divider{
+  display:flex;align-items:center;justify-content:center;gap:.6rem;
+  padding:.5rem 0;
+}
+.programme-divider span{
+  width:14px;height:1px;background:rgba(201,153,58,.5);display:inline-block;
+}
+
+/* ===== Two-day combined programme — side-by-side columns ===== */
+.programme-2col{
+  display:grid;grid-template-columns:1fr 1px 1fr;gap:0;
+  width:100%;max-width:1320px;margin:0 auto;
+  align-items:start;
+}
+.programme-col{padding:0 1.6rem;min-width:0}
+.programme-col-divider{
+  background:rgba(201,153,58,.3);
+  align-self:stretch;justify-self:center;width:1px;
+}
+.programme-2col .programme-day-eyebrow{margin-bottom:.3rem}
+.programme-2col .programme-date{
+  font-size:clamp(1.1rem,1.6vw,1.4rem);
+  margin-bottom:.2rem;
+}
+.programme-2col .programme-strapline{
+  font-size:.72rem;margin-bottom:.7rem;
+}
+.programme-2col .programme-list{
+  border-top:1px solid rgba(201,153,58,.35);
+  max-width:none;
+}
+.programme-2col .programme-row{
+  grid-template-columns:54px 1fr;
+  padding:.32rem 0;
+}
+.programme-2col .programme-row::before{
+  left:54px;top:.32rem;bottom:.32rem;
+}
+.programme-2col .programme-time{
+  font-size:.62rem;
+}
+.programme-2col .programme-content{padding-left:.75rem}
+.programme-2col .programme-title{
+  font-size:.78rem;line-height:1.18;margin-bottom:.08rem;
+}
+.programme-2col .programme-desc{
+  font-size:.6rem;line-height:1.32;
+}
+.programme-2col .programme-divider{padding:.25rem 0;gap:.4rem}
+.programme-2col .programme-divider span{width:8px}
+
+/* ===== Responsive (graceful fallback for very narrow) ===== */
+@media (max-width:900px){
+  :root{--gus-height:160px}
+  .slide{padding:90px 1.75rem 2rem}
+  .topbar{padding:0 1.5rem}
+  .gus-bar .eco-stats{grid-template-columns:repeat(3,1fr)}
+  .gus-bar .eco-s:nth-child(3){border-right:0}
+}
+
+/* =====================================================================
+   ===== PIEoneer Awards finalist badge — ANIMATED SVG (lifted from NAFSA)
+   ===================================================================== */
+
+.pie-badge-layer {
+  top: 80px;
+  right: 0;
+  width: 360px;
+  height: 360px;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* On the Technologies slide, the 5-up card grid takes most of the height —
+   the badge needs to be smaller and tucked into the top-right header area
+   so it doesn't visually fight the cards below. */
+.slide.tools-slide .pie-badge-layer {
+  top: 50px;
+  right: 30px;
+  width: 240px;
+  height: 240px;
+}
+.slide.tools-slide .pie-badge-glow {
+  width: 260px;
+  height: 260px;
+}
+.slide.tools-slide .pie-badge-eyebrow {
+  top: 14px;
+  right: 14px;
+  font-size: .54rem;
+}
+.pie-badge-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity .9s cubic-bezier(.2,.6,.2,1),
+              transform .9s cubic-bezier(.2,.6,.2,1);
+}
+.slide.is-active .pie-badge-stage {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: .35s;
+}
+.pie-badge-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: drop-shadow(0 8px 24px rgba(15,42,79,.12))
+          drop-shadow(0 1px 3px rgba(15,42,79,.08));
+}
+.pie-badge-glow {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 380px;
+  height: 380px;
+  background: radial-gradient(circle at 50% 35%,
+    rgba(212,175,55,.20) 0%,
+    rgba(212,175,55,.08) 30%,
+    transparent 65%);
+  opacity: 0;
+  transition: opacity 1.4s ease;
+  pointer-events: none;
+}
+.slide.is-active .pie-badge-glow {
+  opacity: 1;
+  transition-delay: .25s;
+}
+.pie-badge-eyebrow {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  font-family: var(--sans);
+  font-size: .58rem;
+  letter-spacing: .26em;
+  text-transform: uppercase;
+  color: var(--text-light);
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(8px);
+  transition: opacity .8s ease, transform .8s ease;
+  z-index: 5;
+}
+.pie-badge-eyebrow span {
+  display: inline-block;
+  padding: 4px 0;
+  border-top: 1px solid rgba(45,111,224,.3);
+}
+.slide.is-active .pie-badge-eyebrow {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 1.4s;
+}
+
+/* ===== Entrance animations — only run when slide is active ===== */
+.slide.is-active .small-pie-anim {
+  animation: pie-spin-in 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) .55s forwards;
+}
+@keyframes pie-spin-in {
+  0%   { transform: translate(560px, 210px) rotate(-180deg) scale(0); opacity: 0; }
+  50%  { opacity: 1; }
+  100% { transform: translate(560px, 210px) rotate(0deg)    scale(1); opacity: 1; }
+}
+.slide.is-active .large-slice-anim {
+  animation: large-slice-in 1.2s 1.35s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+@keyframes large-slice-in {
+  0%   { transform: translate(-100px, 100px) scale(0.8); opacity: 0; }
+  100% { transform: translate(0, 0)           scale(1);   opacity: 1; }
+}
+.slide.is-active .pie-text-anim {
+  animation: pie-text-in 1s 2.15s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+@keyframes pie-text-in {
+  0%   { transform: translateY(15px) scale(0.95); opacity: 0; }
+  100% { transform: translateY(0)    scale(1);    opacity: 1; }
+}
+.slide.is-active .bottom-text-anim {
+  animation: bottom-text-in 1.2s 2.75s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+@keyframes bottom-text-in {
+  0%   { transform: translateY(30px); opacity: 0; }
+  100% { transform: translateY(0);    opacity: 1; }
+}
+.small-pie-anim   { opacity: 0; transform: translate(560px, 210px) rotate(-180deg) scale(0); transform-origin: 560px 210px; }
+.large-slice-anim { opacity: 0; transform: translate(-100px, 100px) scale(0.8);             transform-origin: 173px 573px; }
+.pie-text-anim    { opacity: 0; transform: translateY(15px) scale(0.95); }
+.bottom-text-anim { opacity: 0; transform: translateY(30px); }
+
+/* Continuous gentle dance after entrance sequence */
+.slide.is-active .continuous-pie-float {
+  animation: pie-dance 4.5s ease-in-out 4s infinite;
+  transform-origin: 360px 360px;
+}
+@keyframes pie-dance {
+  0%   { transform: rotate(0deg)  scale(1)    translateY(0);   }
+  25%  { transform: rotate(8deg)  scale(1.05) translateY(-12px); }
+  50%  { transform: rotate(0deg)  scale(1)    translateY(0);   }
+  75%  { transform: rotate(-8deg) scale(0.96) translateY(12px); }
+  100% { transform: rotate(0deg)  scale(1)    translateY(0);   }
+}
+
+@media (max-width: 1100px) {
+  .pie-badge-layer { width: 260px; height: 260px; top: 70px; }
+  .pie-badge-glow { width: 280px; height: 280px; }
+  .pie-badge-eyebrow { font-size: .54rem; top: 18px; right: 18px; }
+}
+@media (max-width: 800px) {
+  .pie-badge-layer { display: none; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="viewport">
+<div class="stage" id="stage">
+
+  <!-- ============ TOP BAR ============ -->
+  <div class="topbar">
+    <div class="brand">In<b>Uni</b> · The PIE</div>
+    <div class="crumbs">
+      <span>Vision Brief</span>
+      <span>·</span>
+      <span>2026</span>
+    </div>
+    <div class="progress" id="progress">
+      <button data-go="0" class="active"><div class="dot"></div></button>
+      <button data-go="1"><div class="dot"></div></button>
+      <button data-go="2"><div class="dot"></div></button>
+      <button data-go="3"><div class="dot"></div></button>
+      <button data-go="4"><div class="dot"></div></button>
+      <button data-go="5"><div class="dot"></div></button>
+      <button data-go="6"><div class="dot"></div></button>
+      <button data-go="7"><div class="dot"></div></button>
+      <button data-go="8"><div class="dot"></div></button>
+      <button data-go="9"><div class="dot"></div></button>
+      <button data-go="10"><div class="dot"></div></button>
+    </div>
+  </div>
+
+  <!-- ============ SLIDES ============ -->
+  <div class="slides-area">
+    <div class="slides-track" id="track">
+
+      <!-- ====== SLIDE 1: TITLE ====== -->
+      <section class="slide is-active" data-slide="0">
+        <div class="slide-bg">
+          <div class="parallax-layer" data-depth="0.18" style="top:0;left:0;width:100%;height:50%;background:radial-gradient(ellipse at 50% 0%,rgba(45,111,224,.08),transparent 65%)"></div>
+          <div class="parallax-layer" data-depth="0.10" style="bottom:5%;right:-5%;width:380px;height:380px;border:1px solid rgba(45,111,224,.10);border-radius:50%"></div>
+          <div class="parallax-layer" data-depth="0.22" style="top:12%;left:-3%;width:220px;height:220px;border:1px solid rgba(45,111,224,.15);border-radius:50%"></div>
+          <div class="parallax-layer title-bg-mark" data-depth="0.06">×</div>
+        </div>
+
+        <div class="slide-inner solo" style="max-width:1280px">
+          <h1 class="title-headline reveal d2">The operating system for <span>international education</span>.</h1>
+          <p class="lead reveal d3" style="margin:1.25rem 0 0;max-width:780px;font-size:1rem">From admissions infrastructure to a global academic network — InUni × The PIE, shaping the next chapter of international education together.</p>
+          <div class="title-stats reveal d4">
+            <div class="ps"><strong>31</strong><span>GUS Universities</span></div>
+            <div class="ps"><strong>174K<em>+</em></strong><span>Students</span></div>
+            <div class="ps"><strong>132</strong><span>Countries</span></div>
+            <div class="ps"><strong>5,000<em>+</em></strong><span>Partners</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== SLIDE 2: WHO WE ARE ====== -->
+      <section class="slide" data-slide="1">
+        <div class="slide-bg">
+          <div class="parallax-layer" data-depth="0.15" style="top:0;right:0;width:60%;height:70%;background:radial-gradient(ellipse at 80% 20%,rgba(45,111,224,.07),transparent 65%)"></div>
+          <div class="parallax-layer" data-depth="0.10" style="bottom:-8%;right:-4%;width:480px;height:480px;border:1px solid rgba(45,111,224,.10);border-radius:50%"></div>
+          <div class="parallax-layer" data-depth="0.18" style="top:14%;left:-3%;width:200px;height:200px;border:1px solid rgba(45,111,224,.14);border-radius:50%"></div>
+          <div class="parallax-layer about-bg-mark" data-depth="0.06">i</div>
+        </div>
+
+        <div class="slide-inner solo" style="max-width:1320px">
+          <div class="sec-label reveal d1"><span>Who We Are · Before the vision</span></div>
+
+          <div class="about-grid">
+            <div class="about-col-left">
+              <h1 class="about-headline reveal d2">
+                Not a supplier. <i>An extension</i> of the sector.
+              </h1>
+
+              <p class="about-lead reveal d3">
+                InUni is the operating partner for international growth in higher education — bringing together <strong>institutions, corporates, governments and faculty</strong> through strategy, technology, and execution. We don't replace your team. We extend it.
+              </p>
+
+              <div class="about-gus-strip reveal d4">
+                <span class="ags-eyebrow">A Division of GUS · Global University Systems</span>
+                <span class="ags-line"><b>31 universities</b> across four continents · <b>174,000+</b> students on campus · <b>20m+</b> online · <b>11,000+</b> employees</span>
+              </div>
+            </div>
+
+            <div class="about-col-right reveal d5">
+              <div class="cycle-display" id="aboutCycle">
+                <div class="cycle-frame"></div>
+                <div class="cycle-eyebrow">In Practice</div>
+
+                <div class="cycle-slide is-active" data-cycle="0">
+                  <div class="cs-roman">I.</div>
+                  <h5 class="cs-headline">A <i>tailor-made</i> operating model.</h5>
+                  <p class="cs-body">Embedded teams aligned to each institution's ambition — strategists, admissions, compliance, marketing, in-market.</p>
+                </div>
+
+                <div class="cycle-slide" data-cycle="1">
+                  <div class="cs-roman">II.</div>
+                  <h5 class="cs-headline">Programme Development &amp; <i>Innovation</i>.</h5>
+                  <p class="cs-body">We bring it together. GUS faculty and the InUni ecosystem of industry experts, shaping academic programmes that deliver applied learning, digital skills, and strong employability outcomes across markets and disciplines.</p>
+                </div>
+
+                <div class="cycle-slide" data-cycle="2">
+                  <div class="cs-roman">III.</div>
+                  <h5 class="cs-headline">Admissions, Enrolment &amp; <i>Compliance</i>.</h5>
+                  <p class="cs-body">Commitment to institutional integrity. The full admissions lifecycle — from initial application review and candidate assessment through visa compliance and quality assurance.</p>
+                </div>
+
+                <div class="cycle-dots">
+                  <button class="cd-dot is-active" data-cycle-go="0" aria-label="Show point one"></button>
+                  <button class="cd-dot" data-cycle-go="1" aria-label="Show point two"></button>
+                  <button class="cd-dot" data-cycle-go="2" aria-label="Show point three"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== SLIDE 3: TECHNOLOGIES — Five Components (NAFSA Lab) ====== -->
+      <section class="slide tools-slide" data-slide="2">
+        <div class="slide-bg">
+          <div class="parallax-layer" data-depth="0.2" style="top:0;left:30%;width:40%;height:60%;background:radial-gradient(ellipse,rgba(45,111,224,.08),transparent 65%)"></div>
+          <div class="parallax-layer" data-depth="0.12" style="bottom:10%;right:5%;width:180px;height:180px;border:1px solid rgba(45,111,224,.14);border-radius:8px;transform:rotate(8deg)"></div>
+          <div class="parallax-layer" data-depth="0.08" style="top:8%;left:3%;font-family:var(--serif);font-size:14rem;color:rgba(45,111,224,.04);font-weight:600;line-height:1">5</div>
+
+          <!-- ============================================================
+               PIEoneer Awards finalist badge — INLINE ANIMATED SVG
+               Lifted verbatim from the NAFSA Lab title slide.
+               ============================================================ -->
+          <div class="parallax-layer pie-badge-layer" data-depth="0.08">
+            <div class="pie-badge-stage">
+              <div class="pie-badge-glow"></div>
+
+              <svg class="pie-badge-svg" xmlns="http://www.w3.org/2000/svg"
+                   viewBox="0 0 800 800"
+                   role="img"
+                   aria-label="The PIEoneer Awards 2026 — Digital Innovation of the Year, Student Recruitment, Finalist">
+                <defs>
+                  <linearGradient id="pie-gold-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%"   stop-color="#9E8142"/>
+                    <stop offset="40%"  stop-color="#C5A45A"/>
+                    <stop offset="70%"  stop-color="#EADD8E"/>
+                    <stop offset="100%" stop-color="#FDF0A6"/>
+                  </linearGradient>
+                  <linearGradient id="pie-silver-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%"   stop-color="#DCDDDE"/>
+                    <stop offset="100%" stop-color="#8F9699"/>
+                  </linearGradient>
+                  <filter id="pie-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="-8" dy="12" stdDeviation="10"
+                                  flood-color="#000000" flood-opacity="0.15"/>
+                  </filter>
+                  <path id="pie-small-slice"
+                        d="M 0,0 L 90,0 A 90,90 0 0,1 45,77.94 Z"
+                        fill="url(#pie-silver-grad)"
+                        stroke="#FFFFFF"
+                        stroke-width="6"
+                        stroke-linejoin="round"/>
+                </defs>
+
+                <g class="continuous-pie-float">
+                  <g class="small-pie-anim">
+                    <use href="#pie-small-slice" transform="rotate(40)"/>
+                    <use href="#pie-small-slice" transform="rotate(160)"/>
+                    <use href="#pie-small-slice" transform="rotate(220)"/>
+                    <use href="#pie-small-slice" transform="rotate(-80)"/>
+                    <use href="#pie-small-slice" transform="rotate(-20)"/>
+                  </g>
+
+                  <g class="large-slice-anim" filter="url(#pie-shadow)">
+                    <path d="M 480,260 L 173,346 A 320,320 0 0,0 426,573 Z"
+                          fill="url(#pie-gold-grad)"
+                          stroke="#FFFFFF"
+                          stroke-width="2"/>
+                  </g>
+
+                  <g class="pie-text-anim">
+                    <g transform="translate(245, 318) rotate(-15.6)">
+                      <text font-family="Arial, Helvetica, sans-serif" fill="#5E7A8C">
+                        <tspan font-size="44" font-weight="900" letter-spacing="-1" fill="#2C4A5D">10</tspan>
+                        <tspan font-size="16" font-weight="800" dy="-20" dx="2" fill="#2C4A5D">TH</tspan>
+                        <tspan font-size="20" font-weight="700" dy="20" dx="12" letter-spacing="1">ANNIVERSARY</tspan>
+                      </text>
+                    </g>
+                    <text x="325" y="380" font-family="Arial, Helvetica, sans-serif"
+                          fill="#2C4A5D" text-anchor="middle">
+                      <tspan font-size="22" font-weight="500" x="325" dy="0">The</tspan>
+                      <tspan font-size="44" x="325" dy="44" letter-spacing="1">
+                        <tspan font-weight="900">PIE</tspan><tspan font-weight="400">oneer</tspan>
+                      </tspan>
+                      <tspan font-size="28" font-weight="400" x="325" dy="38" letter-spacing="2">Awards</tspan>
+                      <tspan font-size="30" font-weight="800" x="325" dy="38" letter-spacing="1">2026</tspan>
+                    </text>
+                  </g>
+                </g>
+
+                <g class="bottom-text-anim">
+                  <text x="400" y="670" font-family="Arial, Helvetica, sans-serif"
+                        fill="#2C4A5D" text-anchor="middle">
+                    <tspan font-size="24" font-weight="700" letter-spacing="0.5">Digital innovation of the year -</tspan>
+                    <tspan font-size="24" x="400" dy="32">
+                      <tspan font-weight="700" letter-spacing="0.5">student recruitment</tspan>
+                      <tspan font-weight="300" fill="#7D8C94"> Finalist</tspan>
+                    </tspan>
+                    <tspan font-size="16" x="400" dy="40" fill="#7D8C94" font-weight="600" letter-spacing="0.5">pieoneerawards.com</tspan>
+                  </text>
+                </g>
+              </svg>
+
+              <div class="pie-badge-eyebrow"><span>Recognised</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide-inner solo" style="text-align:left;max-width:1380px">
+          <div class="tools-header reveal d1" style="margin-bottom:.85rem">
+            <div class="sec-label" style="justify-content:flex-start;margin-bottom:.4rem"><span>Technologies</span></div>
+            <h2 class="reveal d2" style="font-size:clamp(1.5rem,2.8vw,2.2rem);margin-bottom:.4rem;line-height:1.1">Five components. <i>One</i> integrated system.</h2>
+            <p class="lead reveal d3" style="max-width:760px;font-size:.82rem;margin-bottom:0;line-height:1.5">Each addresses a specific point of structural failure. Variation is removed before decisions are made.</p>
+          </div>
+
+          <div class="tools-grid five-up">
+            <div class="tool-card compact reveal d3">
+              <div class="tool-head">
+                <div>
+                  <div class="tool-id">/ T.01 · Tool Spotlight</div>
+                  <h4>InUni / <b>Suitability</b></h4>
+                </div>
+                <div class="tool-metric">
+                  <strong>7,592</strong>
+                  <span>Hrs · 2025</span>
+                </div>
+              </div>
+              <div class="tool-body">
+                <div class="tb-row">
+                  <div class="tb-key">Solves</div>
+                  <div class="tb-val b-headline">Inconsistent screening across agents and markets.</div>
+                </div>
+                <div class="tb-row">
+                  <div class="tb-key">Changes</div>
+                  <div class="tb-val">
+                    <ul>
+                      <li>Structured AI-led interviews</li>
+                      <li>Essay feedback flags gaps, preserves voice</li>
+                      <li>Pre-assessed applications for reviewers</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="tool-foot">Variation removed before decisions are made.</div>
+            </div>
+
+            <div class="tool-card compact reveal d4">
+              <div class="tool-head">
+                <div>
+                  <div class="tool-id">/ T.02 · Tool Spotlight</div>
+                  <h4>InUni / <b>Ready</b></h4>
+                </div>
+                <div class="tool-metric">
+                  <strong>10/15/<em>30%</em></strong>
+                  <span>Visa · Sched · Prep</span>
+                </div>
+              </div>
+              <div class="tool-body">
+                <div class="tb-row">
+                  <div class="tb-key">Solves</div>
+                  <div class="tb-val b-headline">Applicants enter interviews unprepared.</div>
+                </div>
+                <div class="tb-row">
+                  <div class="tb-key">Changes</div>
+                  <div class="tb-val">
+                    <ul>
+                      <li>Students practise structured responses</li>
+                      <li>Readiness tracked across cohorts</li>
+                      <li>At-risk applicants flagged early</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="tool-foot">21 countries, 11 time zones.</div>
+            </div>
+
+            <div class="tool-card compact reveal d5">
+              <div class="tool-head">
+                <div>
+                  <div class="tool-id">/ T.03 · Tool Spotlight</div>
+                  <h4>InUni / <b>Evaluator</b></h4>
+                </div>
+                <div class="tool-metric">
+                  <strong><em>57%</em></strong>
+                  <span>Faster · 35→15 min</span>
+                </div>
+              </div>
+              <div class="tool-body">
+                <div class="tb-row">
+                  <div class="tb-key">Solves</div>
+                  <div class="tb-val b-headline">Manual GPA and document verification.</div>
+                </div>
+                <div class="tb-row">
+                  <div class="tb-key">Changes</div>
+                  <div class="tb-val">
+                    <ul>
+                      <li>Checked against eligibility criteria</li>
+                      <li>Consistent across reviewers and markets</li>
+                      <li>Verified files progress without re-checks</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="tool-foot">Judgment applied only to eligible applications.</div>
+            </div>
+
+            <div class="tool-card compact reveal d6">
+              <div class="tool-head">
+                <div>
+                  <div class="tool-id">/ T.04 · Tool Spotlight</div>
+                  <h4>InUni / <b>Navigator</b></h4>
+                </div>
+                <div class="tool-metric">
+                  <strong>50+ / 24-7</strong>
+                  <span>Languages · Always-on</span>
+                </div>
+              </div>
+              <div class="tool-body">
+                <div class="tb-row">
+                  <div class="tb-key">Solves</div>
+                  <div class="tb-val b-headline">Inconsistent guidance across time zones and agents.</div>
+                </div>
+                <div class="tb-row">
+                  <div class="tb-key">Changes</div>
+                  <div class="tb-val">
+                    <ul>
+                      <li>Students access accurate info independently</li>
+                      <li>Consistent guidance across markets</li>
+                      <li>Institutions control information at scale</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="tool-foot">42% of consultations now outside UK hours.</div>
+            </div>
+
+            <div class="tool-card compact reveal d6">
+              <div class="tool-head">
+                <div>
+                  <div class="tool-id">/ T.05 · Tool Spotlight</div>
+                  <h4>InUni / <b>TNE</b></h4>
+                </div>
+                <div class="tool-metric">
+                  <strong>5-step</strong>
+                  <span>Extract → Output</span>
+                </div>
+              </div>
+              <div class="tool-body">
+                <div class="tb-row">
+                  <div class="tb-key">Solves</div>
+                  <div class="tb-val b-headline">Compliance rebuilt from scratch each framework change.</div>
+                </div>
+                <div class="tb-row">
+                  <div class="tb-key">Changes</div>
+                  <div class="tb-val">
+                    <ul>
+                      <li>Data extracted and cross-referenced</li>
+                      <li>Teams review outputs, don't build from scratch</li>
+                      <li>Regenerates instantly on framework change</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="tool-foot">Compliance becomes a structured, regenerable output.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== SLIDE 4: OUTCOMES — 2025 (NAFSA Lab) ====== -->
+      <section class="slide content-slide" data-slide="3" style="padding-top:60px">
+        <style>
+          .slide[data-slide="3"] .outcomes-table .ot-row { padding: .42rem 1.25rem; }
+          .slide[data-slide="3"] .outcomes-table .ot-row.head { padding: .38rem 1.25rem; }
+          .slide[data-slide="3"] .outcomes-table .ot-metric { font-size: 1.1rem; }
+        </style>
+        <div class="slide-bg">
+          <div class="parallax-layer" data-depth="0.18" style="top:0;left:50%;transform:translateX(-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(45,111,224,.05),transparent 70%);border-radius:50%"></div>
+          <div class="parallax-layer" data-depth="0.1" style="top:10%;right:3%;font-family:var(--serif);font-size:16rem;color:rgba(45,111,224,.03);font-weight:600;line-height:1;font-style:italic">2025</div>
+        </div>
+
+        <div class="slide-inner solo" style="max-width:1280px">
+          <div class="sec-label reveal d1" style="justify-content:center;margin-bottom:.3rem"><span>Outcomes — 2025</span></div>
+          <h2 class="reveal d2" style="font-size:clamp(1.4rem,2.6vw,2rem);margin-bottom:.2rem;line-height:1.1;text-align:center">What the system delivered. <i>One</i> operating year.</h2>
+          <p class="lead reveal d3" style="max-width:720px;margin:0 auto .55rem;font-size:.78rem;line-height:1.5;text-align:center">Same standardised pipeline. All markets.</p>
+          <div class="outcomes-table reveal d4" style="--ot-pad:.42rem">
+            <div class="ot-row head">
+              <div>ID</div><div>Metric</div><div>Outcome</div><div>Original Challenge</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">0.01</div>
+              <div class="ot-metric">30,000<em>+</em></div>
+              <div class="ot-outcome">Applications screened through the system</div>
+              <div class="ot-orig">Variation between agents</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">0.02</div>
+              <div class="ot-metric"><em>57%</em><small>faster</small></div>
+              <div class="ot-outcome">Application review (35 → 15 min)</div>
+              <div class="ot-orig">Manual GPA checks</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">0.03</div>
+              <div class="ot-metric">7,592<small>hrs</small></div>
+              <div class="ot-outcome">Returned to professional judgment</div>
+              <div class="ot-orig">Experts trapped in repetition</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">0.04</div>
+              <div class="ot-metric"><em>42%</em></div>
+              <div class="ot-outcome">Consultations outside UK working hours</div>
+              <div class="ot-orig">Time-zone coverage gaps</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">0.05</div>
+              <div class="ot-metric">50<em>+</em><small>langs</small></div>
+              <div class="ot-outcome">Served, no additional staffing</div>
+              <div class="ot-orig">Inconsistent guidance</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">0.06</div>
+              <div class="ot-metric">21<small>countries</small></div>
+              <div class="ot-outcome">Structured interview preparation · 11 time zones</div>
+              <div class="ot-orig">Unprepared cohorts</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">0.07</div>
+              <div class="ot-metric">5,000<em>+</em></div>
+              <div class="ot-outcome">Partners operating within one system</div>
+              <div class="ot-orig">Channel fragmentation</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== SLIDE 5: B2C JOURNEY ====== -->
+      <section class="slide content-slide" data-slide="4">
+        <div class="slide-bg">
+          <div class="parallax-layer" data-depth="0.15" style="top:0;right:0;width:55%;height:60%;background:linear-gradient(225deg,rgba(45,111,224,.06),transparent 70%)"></div>
+          <div class="parallax-layer" data-depth="0.2" style="bottom:8%;left:6%;width:160px;height:160px;border:1px dashed rgba(45,111,224,.22);border-radius:50%"></div>
+          <div class="parallax-layer" data-depth="0.12" style="top:18%;right:8%;width:90px;height:90px;background:rgba(45,111,224,.06);border-radius:50%"></div>
+          <div class="parallax-layer" data-depth="0.1" style="top:10%;right:3%;font-family:var(--serif);font-size:11rem;color:rgba(45,111,224,.03);font-weight:600;line-height:1;font-style:italic;letter-spacing:-.02em">2026–2027</div>
+        </div>
+
+        <div class="slide-inner solo" style="max-width:1320px">
+          <div class="sec-label reveal d1"><span>What's Next · For Students</span></div>
+          <h2 class="reveal d2">An <i>AI-guided</i> journey, from first lead to landed visa.</h2>
+          <p class="lead reveal d3" style="max-width:880px">Six gates. One profile. Every partner already on the rails — lenders, test providers, VFS, and our 31-university admissions network.</p>
+
+          <div class="method-grid-6">
+            <div class="method-card reveal d3">
+              <div class="m-bars"><i></i><i></i><i></i></div>
+              <div class="m-num">01 · Discover</div>
+              <h5><i>Match</i> & explore.</h5>
+              <p>AI maps interest, GPA, budget to fit programmes across the network.</p>
+            </div>
+            <div class="method-card reveal d3">
+              <div class="m-bars"><i></i><i></i><i></i></div>
+              <div class="m-num">02 · Eligibility</div>
+              <h5><i>GPA</i> calculated.</h5>
+              <p>Auto-conversion across systems · admit probability per university rubric.</p>
+            </div>
+            <div class="method-card reveal d4">
+              <div class="m-bars"><i></i><i></i><i></i></div>
+              <div class="m-num">03 · Apply</div>
+              <h5><i>Admit</i> delivered.</h5>
+              <p>One profile, many offers — final decision rests with the university.</p>
+            </div>
+            <div class="method-card reveal d5">
+              <div class="m-bars"><i></i><i></i><i></i></div>
+              <div class="m-num">04 · Fund</div>
+              <h5><i>Loans</i> & test prep.</h5>
+              <p>Lender match, scholarship search, language &amp; graduate admissions test prep.</p>
+            </div>
+            <div class="method-card reveal d6">
+              <div class="m-bars"><i></i><i></i><i></i></div>
+              <div class="m-num">05 · Visa</div>
+              <h5><i>VFS</i> ready.</h5>
+              <p>Document QA, slot booking, financial-evidence checks, biometric reminders.</p>
+            </div>
+            <div class="method-card reveal d6">
+              <div class="m-bars"><i></i><i></i><i></i></div>
+              <div class="m-num">06 · Arrival</div>
+              <h5><i>Onboard</i> & community.</h5>
+              <p>Pre-departure, accommodation, alumni mentorship, in-country support.</p>
+            </div>
+          </div>
+
+          <div class="method-principle reveal d6">
+            <div class="mp-tag">Outcome</div>
+            <div class="mp-line">One student profile.  One trusted journey. <i>Every partner already inside the ecosystem.</i></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== SLIDE 6: ACADEMIC INTELLIGENCE ECOSYSTEM ====== -->
+      <section class="slide content-slide" data-slide="5" style="padding-top:60px">
+        <style>
+          .slide[data-slide="5"] .outcomes-table .ot-row { padding: .42rem 1.25rem; }
+          .slide[data-slide="5"] .outcomes-table .ot-row.head { padding: .38rem 1.25rem; }
+          .slide[data-slide="5"] .outcomes-table .ot-metric { font-size: 1.1rem; }
+          .slide[data-slide="5"] .aie-stats .as { padding: 1rem 1.25rem; }
+          .slide[data-slide="5"] .aie-stats .as strong { font-size: 2rem; }
+          .slide[data-slide="5"] .aie-stats { margin: 1rem 0; }
+        </style>
+        <div class="slide-bg">
+          <div class="parallax-layer" data-depth="0.18" style="top:0;left:50%;transform:translateX(-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(45,111,224,.07),transparent 70%);border-radius:50%"></div>
+          <div class="parallax-layer" data-depth="0.1" style="top:10%;right:3%;font-family:var(--serif);font-size:16rem;color:rgba(45,111,224,.04);font-weight:600;line-height:1;font-style:italic">10K</div>
+        </div>
+
+        <div class="slide-inner solo" style="max-width:1280px">
+          <div class="sec-label reveal d1" style="margin-bottom:.3rem"><span>What's Next · For Academia</span></div>
+          <h2 class="reveal d2" style="font-size:clamp(1.4rem,2.6vw,2rem);margin-bottom:.2rem;line-height:1.1">Academic <i>Intelligence</i> Ecosystem.</h2>
+          <p class="lead reveal d3" style="font-size:.85rem;line-height:1.5;margin-bottom:.4rem">10,000 universities. One network. <i style="color:var(--accent);font-weight:500">University-to-university</i> — directly.</p>
+
+          <div class="aie-stats reveal d4">
+            <div class="as"><strong><em>10K</em></strong><span>Universities onboarding globally</span></div>
+            <div class="as"><strong>U2U</strong><span>Direct university-to-university</span></div>
+            <div class="as"><strong><em>1</em></strong><span>Unified ecosystem</span></div>
+          </div>
+
+          <div class="outcomes-table reveal d5">
+            <div class="ot-row head">
+              <div>ID</div><div>Capability</div><div>What it enables</div><div>Stakeholders</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">A.01</div>
+              <div class="ot-metric">TNE</div>
+              <div class="ot-outcome">Joint delivery, dual awards, articulation, branch campuses</div>
+              <div class="ot-orig">Universities · Ministries</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">A.02</div>
+              <div class="ot-metric"><em>Research</em></div>
+              <div class="ot-outcome">Co-authored grants, shared labs, doctoral exchange, IP</div>
+              <div class="ot-orig">Faculties · Research bodies</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">A.03</div>
+              <div class="ot-metric">U2U</div>
+              <div class="ot-outcome">Direct student mobility — no middle layer, full institutional trust</div>
+              <div class="ot-orig">Universities · Student unions</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">A.04</div>
+              <div class="ot-metric"><em>Strategic</em></div>
+              <div class="ot-outcome">Curriculum, faculty exchange, micro-credentials, exec ed</div>
+              <div class="ot-orig">Universities · Industry</div>
+            </div>
+            <div class="ot-row">
+              <div class="ot-id">A.05</div>
+              <div class="ot-metric">Convening</div>
+              <div class="ot-outcome">Unions, embassies, governments, industry, conference orgs</div>
+              <div class="ot-orig">All sector stakeholders</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== SLIDE 7: NETWORK MAP ====== -->
+      <section class="slide" data-slide="6">
+        <div class="slide-bg">
+          <div class="parallax-layer" data-depth="0.2" style="top:0;left:0;width:50%;height:100%;background:linear-gradient(135deg,rgba(45,111,224,.06),transparent 60%)"></div>
+          <div class="parallax-layer" data-depth="0.08" style="top:8%;right:5%;font-family:var(--serif);font-size:18rem;color:rgba(45,111,224,.035);font-weight:600;line-height:1;font-style:italic">∞</div>
+        </div>
+
+        <div class="slide-inner" style="max-width:1320px;grid-template-columns:0.95fr 1.1fr">
+          <div>
+            <div class="sec-label reveal d1"><span>The Network</span></div>
+            <h2 class="reveal d2" style="font-size:clamp(1.8rem,3.2vw,2.6rem);line-height:1.08">InUni as the <i>connective tissue</i> of global academia.</h2>
+            <p class="lead reveal d3">Existing relationships, activated. New flows, enabled. One trusted convener — bringing universities, governments, industry and conveners into the same network.</p>
+
+            <div class="method-principle reveal d4" style="margin-top:1.4rem">
+              <div class="mp-tag">Trust</div>
+              <div class="mp-line">Within the GUS family — <i>31 universities, 4 continents</i>, already aligned.</div>
+            </div>
+          </div>
+
+          <div class="reveal d4">
+            <div class="network-canvas">
+              <div class="network-hub" id="netHub">
+                <div class="ring r3"></div>
+                <div class="ring r2"></div>
+                <div class="ring"></div>
+                <div class="glow"></div>
+                <svg class="network-conn" id="netConn" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+                <div class="core">
+                  <div>
+                    <div class="hw">InUni</div>
+                    <div class="hs">Academic Intelligence</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== SLIDE 8: GRAND CONVOCATION ====== -->
+      <section class="slide content-slide" data-slide="7" style="padding-top:60px">
+        <style>
+          .slide[data-slide="7"] .convo-ticket { padding: 1.4rem 1.6rem 1.2rem; gap: .35rem; }
+          .slide[data-slide="7"] .convo-ticket .ct-date { font-size: 4.4rem; margin: .2rem 0 .15rem; }
+          .slide[data-slide="7"] .convo-ticket .ct-title { font-size: 1.05rem; margin-bottom: .35rem; }
+          .slide[data-slide="7"] .convo-ticket .ct-rule { margin: .6rem 0 .5rem; }
+          .slide[data-slide="7"] .convo-ticket .ct-culm { padding: .65rem .85rem; }
+          .slide[data-slide="7"] .vision-card { padding: .9rem 1rem; gap: .3rem; }
+          .slide[data-slide="7"] .vision-card h5 { font-size: 1rem; }
+          .slide[data-slide="7"] .vision-card p { font-size: .68rem; line-height: 1.45; }
+          .slide[data-slide="7"] .vision-grid { gap: .65rem; }
+          .slide[data-slide="7"] .the-ask { margin-top: .65rem; padding: .65rem .9rem; }
+          .slide[data-slide="7"] .the-ask .ask-line { font-size: .85rem; }
+        </style>
+        <div class="slide-bg">
+          <div class="parallax-layer" data-depth="0.2" style="top:0;right:-5%;width:50%;height:80%;background:radial-gradient(circle,rgba(45,111,224,.08),transparent 60%)"></div>
+          <div class="parallax-layer" data-depth="0.1" style="top:8%;left:6%;width:240px;height:240px;border:1px solid rgba(45,111,224,.12);border-radius:50%"></div>
+        </div>
+
+        <div class="slide-inner solo" style="max-width:1320px">
+          <div class="sec-label reveal d1" style="margin-bottom:.3rem"><span>Where it Begins · Convocation Sep 2026</span></div>
+          <h2 class="reveal d2" style="font-size:clamp(1.4rem,2.6vw,2rem);margin-bottom:.2rem;line-height:1.1">Our <i>vision</i> for the Convocation.</h2>
+          <p class="lead reveal d3" style="max-width:880px;font-size:.82rem;line-height:1.5;margin-bottom:.4rem">The annual gathering where the world's higher education leadership convenes — and where international education's defining moment is celebrated.</p>
+
+          <div class="convo-grid" style="margin-top:.6rem">
+            <div class="convo-ticket reveal d3">
+              <div class="ct-eyebrow">The InUni Grand Convocation</div>
+              <div class="ct-title">on Global Higher Education</div>
+              <div class="ct-date">3<i>–</i>4</div>
+              <div class="ct-dline">SEPTEMBER 2026 · LONDON</div>
+              <div class="ct-rule"></div>
+              <div class="ct-by">By personal invitation only.</div>
+              <div class="ct-aud">Vice-Chancellors · Presidents · Rectors · Senior Policy Leaders</div>
+              <div class="ct-culm">
+                <span>CULMINATING IN</span>
+                <b>The PIE Awards Gala · 4 Sept</b>
+              </div>
+            </div>
+
+            <div>
+              <div class="vision-grid">
+                <div class="vision-card reveal d3">
+                  <span class="v-tag">v.01</span>
+                  <h5>The right <i>room</i>.</h5>
+                  <p>VCs, Presidents, Rectors from across the globe — by personal invitation only.</p>
+                </div>
+                <div class="vision-card reveal d4">
+                  <span class="v-tag">v.02</span>
+                  <h5>Substance, not <i>spectacle</i>.</h5>
+                  <p>TNE case studies, policy panels, AI in admissions, summit declaration.</p>
+                </div>
+                <div class="vision-card reveal d5">
+                  <span class="v-tag">v.03</span>
+                  <h5>PIE at the <i>crown</i>.</h5>
+                  <p>The PIE Awards Gala as the evening's culminating ceremony — co-hosted, co-celebrated.</p>
+                </div>
+                <div class="vision-card reveal d6">
+                  <span class="v-tag">v.04</span>
+                  <h5>Built to <i>recur</i>.</h5>
+                  <p>Year one launches the format · year two scales it · PIE shapes it from day one.</p>
+                </div>
+              </div>
+
+              <div class="the-ask reveal d6">
+                <span class="ask-tag">— THE ASK</span>
+                <span class="ask-line">PIE as the headline partner of the Grand Convocation 2026.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== SLIDE 9: THE INVITATION (faithful reproduction) ====== -->
+      <section class="slide" data-slide="8" style="padding:0">
+        <div class="invite-canvas">
+          <div class="invite-grid">
+            <div class="invite-left reveal d1">
+              <div class="invite-stars">✦   ✦   ✦</div>
+              <div class="invite-wordmark">I N U N I</div>
+              <div class="invite-sub">GLOBAL UNIVERSITY SYSTEMS</div>
+              <div class="invite-rule"></div>
+              <div class="invite-req">requests the honour of your presence at</div>
+              <div class="invite-title">The Grand Convocation<br>on <i>Global Higher Education</i></div>
+              <div class="invite-date">3RD – 4TH SEPTEMBER 2026</div>
+              <div class="invite-loc">London · By personal invitation</div>
+            </div>
+            <div class="invite-divider"></div>
+            <div class="invite-right reveal d3">
+              <h6>Convened For</h6>
+              <p class="formal">Vice-Chancellors · Presidents · Rectors · Provosts. Ministers and senior policy leaders. The architects of cross-border academic partnership.</p>
+
+              <h6>Within the GUS Ecosystem</h6>
+              <p>Hosted at GUS Group institutions in London — a private education group operating 31 universities across four continents, with 122,000 students on campus and 20 million more online. Delegates are introduced to its academic leadership, its institutions, and the operating model behind one of the world's largest private higher-education networks.</p>
+
+              <h6>The Programme</h6>
+              <p>Two days convened with international leaders of higher education — heads of universities, ministries and academic institutions, contributing to the panels and roundtables as peers rather than as an audience. Sessions on TNE strategy, AI in admissions, accreditation and ethical partnership. A guided showcase of the GUS Group's London universities. Closing with the Summit Declaration.</p>
+
+              <div class="end-rule">
+                <div class="end-rsvp"><em>SMART FORMAL</em>  ·  RSVP by 30<sup>th</sup> June 2026</div>
+                <div class="end-email">partnerships@inuniglobal.com</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== SLIDE 10: PROGRAMME — TWO-DAY COMBINED ====== -->
+      <section class="slide programme-slide" data-slide="9" style="padding:60px 3rem 1rem;align-items:flex-start">
+        <div class="slide-bg">
+          <div class="parallax-layer" data-depth="0.08" style="top:6%;right:4%;width:200px;height:200px;border:1px solid rgba(201,153,58,.18);border-radius:50%"></div>
+          <div class="parallax-layer" data-depth="0.12" style="bottom:8%;left:5%;width:140px;height:140px;border:1px solid rgba(201,153,58,.14);border-radius:50%"></div>
+        </div>
+
+        <div class="slide-inner solo" style="max-width:1380px">
+          <div class="programme-2col">
+
+            <!-- DAY ONE -->
+            <div class="programme-col reveal d2">
+              <div class="programme-day-eyebrow">DAY ONE</div>
+              <h2 class="programme-date">Thursday, 3rd September 2026</h2>
+              <p class="programme-strapline"><i>Knowledge</i><span>·</span><i>Evidence</i><span>·</span><i>Partnership</i></p>
+
+              <div class="programme-list">
+                <div class="programme-row">
+                  <div class="programme-time">08:30</div>
+                  <div class="programme-content">
+                    <div class="programme-title">Registration &amp; Welcome Coffee</div>
+                    <div class="programme-desc">Grand Hall, GUS London — delegates arrive</div>
+                  </div>
+                </div>
+                <div class="programme-row">
+                  <div class="programme-time">09:15</div>
+                  <div class="programme-content">
+                    <div class="programme-title">Formal Opening Ceremony</div>
+                    <div class="programme-desc">Chancellor's Address — Setting the agenda for global TNE</div>
+                  </div>
+                </div>
+                <div class="programme-row">
+                  <div class="programme-time">10:15</div>
+                  <div class="programme-content">
+                    <div class="programme-title">In-Depth Case Studies I</div>
+                    <div class="programme-desc">Institutional reputation, student outcomes &amp; global reach</div>
+                  </div>
+                </div>
+                <div class="programme-row">
+                  <div class="programme-time">12:00</div>
+                  <div class="programme-content">
+                    <div class="programme-title">President's Roundtable Luncheon</div>
+                    <div class="programme-desc">Invitation-only — Vice-Chancellors, Presidents &amp; Rectors</div>
+                  </div>
+                </div>
+                <div class="programme-row">
+                  <div class="programme-time">13:45</div>
+                  <div class="programme-content">
+                    <div class="programme-title">Thought Leadership Panel I</div>
+                    <div class="programme-desc">The Future of International Academic Collaboration</div>
+                  </div>
+                </div>
+                <div class="programme-row">
+                  <div class="programme-time">14:45</div>
+                  <div class="programme-content">
+                    <div class="programme-title">Thought Leadership Panel II</div>
+                    <div class="programme-desc">Digital Transformation &amp; AI in Transnational Education</div>
+                  </div>
+                </div>
+                <div class="programme-row">
+                  <div class="programme-time">15:45</div>
+                  <div class="programme-content">
+                    <div class="programme-title">Afternoon Break</div>
+                  </div>
+                </div>
+                <div class="programme-row">
+                  <div class="programme-time">16:00</div>
+                  <div class="programme-content">
+                    <div class="programme-title">Roundtable Discussions A &amp; B</div>
+                    <div class="programme-desc">Dual-degree programmes · Faculty exchange initiatives</div>
+                  </div>
+                </div>
+                <div class="programme-row">
+                  <div class="programme-time">17:30</div>
+                  <div class="programme-content">
+                    <div class="programme-title">Evening Reception &amp; Pre-Dinner Drinks</div>
+                    <div class="programme-desc">Informal networking at GUS London</div>
+                  </div>
+                </div>
+                <div class="programme-row">
+                  <div class="programme-time">19:30</div>
+                  <div class="programme-content">
+                    <div class="programme-title">Welcome Dinner &amp; Opening Keynote</div>
+                    <div class="programme-desc">Formal dinner with keynote address by a renowned figure</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="programme-col-divider"></div>
+
+            <!-- DAY TWO -->
+            <div class="programme-col reveal d3">
+              <div class="programme-day-eyebrow">DAY TWO</div>
+              <h2 class="programme-date">Friday, 4th September 2026</h2>
+              <p class="programme-strapline"><i>Innovation</i><span>·</span><i>Discovery</i><span>·</span><i>Celebration</i></p>
+
+              <div class="programme-list">
+                <div class="programme-row">
+                  <div class="programme-time">08:30</div>
+                  <div class="programme-content">
+                    <div class="programme-title">Academic Workshops I–III</div>
+                    <div class="programme-desc">Digital platforms · Cross-border accreditation · AI in education</div>
+                  </div>
+                </div>
+                <div class="programme-row">
+                  <div class="programme-time">09:45</div>
+                  <div class="programme-content">
+                    <div class="programme-title">Thought Leadership Panels III &amp; IV</div>
+                    <div class="programme-desc">Policy implications · Sustainable &amp; ethical partnership models</div>
+                  </div>
+                </div>
+                <div class="programme-row">
+                  <div class="programme-time">11:00</div>
+                  <div class="programme-content">
+                    <div class="programme-title">Academic Workshops IV–VI</div>
+                    <div class="programme-desc">Resilient partnerships · Impact measurement · Student welfare</div>
+                  </div>
+                </div>
+                <div class="programme-row">
+                  <div class="programme-time">12:15</div>
+                  <div class="programme-content">
+                    <div class="programme-title">Roundtable Discussions C &amp; D</div>
+                    <div class="programme-desc">Joint research ventures · Student mobility &amp; cross-border experience</div>
+                  </div>
+                </div>
+                <div class="programme-row">
+                  <div class="programme-time">13:15</div>
+                  <div class="programme-content">
+                    <div class="programme-title">Summit Declaration &amp; Communiqué</div>
+                    <div class="programme-desc">Adoption of shared commitments to global TNE excellence</div>
+                  </div>
+                </div>
+                <div class="programme-row">
+                  <div class="programme-time">13:45</div>
+                  <div class="programme-content">
+                    <div class="programme-title">Closing Remarks &amp; Luncheon</div>
+                    <div class="programme-desc">INUNI Leadership address — followed by farewell luncheon</div>
+                  </div>
+                </div>
+                <div class="programme-row">
+                  <div class="programme-time">15:00</div>
+                  <div class="programme-content">
+                    <div class="programme-title">GUS Group Universities Showcase Tour</div>
+                    <div class="programme-desc">Exclusive guided tour of GUS Group's UK universities portfolio</div>
+                  </div>
+                </div>
+                <div class="programme-row">
+                  <div class="programme-time">17:30</div>
+                  <div class="programme-content">
+                    <div class="programme-title">Afternoon at Leisure</div>
+                    <div class="programme-desc">Delegates retire to refresh and prepare for the Grand Gala Evening</div>
+                  </div>
+                </div>
+
+                <div class="programme-divider"><span></span><span></span><span></span><span></span><span></span></div>
+
+                <div class="programme-row">
+                  <div class="programme-time">18:30</div>
+                  <div class="programme-content">
+                    <div class="programme-title">Guests Depart for the Gala Venue</div>
+                    <div class="programme-desc">Onward to the Grand Gala Dinner &amp; PIE Awards Night</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- ====== SLIDE 11: WHY THIS MATTERS / CLOSING ====== -->
+      <section class="slide content-slide" data-slide="10" style="padding-top:60px">
+        <style>
+          .slide[data-slide="10"] h2 { font-size: clamp(1.6rem, 3vw, 2.4rem) !important; margin-bottom: .25rem; line-height: 1.1; }
+          .slide[data-slide="10"] .lead { font-size: .82rem; line-height: 1.5; margin-bottom: .5rem; }
+          .slide[data-slide="10"] .philo-grid { gap: .75rem; margin-top: .75rem; }
+          .slide[data-slide="10"] .philo-card { padding: 1rem 1.2rem; }
+          .slide[data-slide="10"] .philo-card .p-tag { margin-bottom: .85rem; padding-bottom: .55rem; }
+          .slide[data-slide="10"] .philo-card h5 { font-size: 1.05rem; margin-bottom: .55rem; }
+          .slide[data-slide="10"] .philo-card p { font-size: .72rem; line-height: 1.5; }
+          .slide[data-slide="10"] .why-pie-strip { padding: .85rem 1.2rem; margin-top: .85rem; }
+          .slide[data-slide="10"] .why-pie-strip .wp-line { font-size: .9rem; line-height: 1.4; }
+        </style>
+        <div class="slide-bg">
+          <div class="parallax-layer" data-depth="0.2" style="top:0;left:0;right:0;height:100%;background:radial-gradient(circle at 50% 0%,rgba(45,111,224,.1),transparent 60%)"></div>
+          <div class="parallax-layer" data-depth="0.1" style="top:8%;left:6%;width:260px;height:260px;border:1px solid rgba(45,111,224,.14);border-radius:50%"></div>
+          <div class="parallax-layer" data-depth="0.16" style="bottom:14%;right:8%;width:200px;height:200px;border:1px solid rgba(45,111,224,.18);border-radius:50%"></div>
+        </div>
+
+        <div class="slide-inner solo" style="max-width:1280px">
+          <div class="sec-label reveal d1" style="margin-bottom:.3rem"><span>The Invitation · Why this matters</span></div>
+          <h2 class="reveal d2">This is <i>bigger</i> than InUni.</h2>
+          <p class="lead reveal d3" style="max-width:780px">The future of how international education connects, decides and grows.</p>
+
+          <div class="philo-grid">
+            <div class="philo-card reveal d3">
+              <div class="p-tag">P.01 · For Students</div>
+              <h5>A clearer <i>journey</i>.</h5>
+              <p>Students, families and universities move through one trusted system — fewer fragments, fewer agents, fewer surprises.</p>
+            </div>
+            <div class="philo-card reveal d4">
+              <div class="p-tag">P.02 · For the Sector</div>
+              <h5>A connected <i>sector</i>.</h5>
+              <p>Universities, governments, industry, conveners working in the same network — not in silos.</p>
+            </div>
+            <div class="philo-card reveal d5">
+              <div class="p-tag">P.03 · For the Future</div>
+              <h5>A shared <i>future</i>.</h5>
+              <p>Quality, integrity and student outcomes rise together — measurable, transparent, fair.</p>
+            </div>
+          </div>
+
+          <div class="why-pie-strip reveal d6">
+            <span class="wp-tag">— Why The PIE</span>
+            <span class="wp-line">The PIE has long been the voice of international education. We want to <i>build this with you</i> — telling the story, shaping the standards, celebrating what works.</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- ============ PERSISTENT GUS INFRASTRUCTURE ============ -->
+  <aside class="gus-bar" aria-label="Global University Systems Infrastructure">
+    <div class="gus-cobrand">
+      <span class="ecb-label">A Division of</span>
+      <span class="ecb-divider"></span>
+      <span class="ecb-mark">GUS<b> · </b>Global University Systems</span>
+    </div>
+
+    <div class="eco-stats">
+      <div class="eco-s"><strong>31</strong><span>Institutions</span></div>
+      <div class="eco-s"><strong>174K+</strong><span>Students</span></div>
+      <div class="eco-s"><strong>3K+</strong><span>Courses</span></div>
+      <div class="eco-s"><strong>130+</strong><span>Academic Partners</span></div>
+      <div class="eco-s"><strong>6K+</strong><span>Market Partners</span></div>
+      <div class="eco-s"><strong>11K+</strong><span>Employees</span></div>
+    </div>
+
+    <div class="ticker-wrap">
+      <div class="ticker">
+        <span>Arden University</span><span>University of Law</span><span>UPES India</span><span>University Canada West</span><span>UNF Canada</span><span>GISMA</span><span>UE Applied Sciences</span><span>Saba University</span><span>MUA</span><span>FutureLearn</span><span>Pearl Academy</span><span>BSBI Berlin</span><span>LCCA London</span><span>TSOM Toronto</span><span>LSBF Singapore</span><span>CCTB</span><span>Fleming College</span><span>LCCM</span><span>htk Academy</span><span>Niagara College</span><span>St. Matthew's</span>
+        <span>Arden University</span><span>University of Law</span><span>UPES India</span><span>University Canada West</span><span>UNF Canada</span><span>GISMA</span><span>UE Applied Sciences</span><span>Saba University</span><span>MUA</span><span>FutureLearn</span><span>Pearl Academy</span><span>BSBI Berlin</span><span>LCCA London</span><span>TSOM Toronto</span><span>LSBF Singapore</span><span>CCTB</span><span>Fleming College</span><span>LCCM</span><span>htk Academy</span><span>Niagara College</span><span>St. Matthew's</span>
+      </div>
+    </div>
+  </aside>
+
+</div>
+</div>
+
+<script>
+/* Canvas scale-to-fit (lifted from NAFSA) */
+(function(){
+  const stage=document.getElementById('stage');
+  if(!stage)return;
+  function fit(){
+    const cw=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--canvas-width'))||1440;
+    const ch=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--canvas-height'))||900;
+    const scale=Math.min(window.innerWidth/cw, window.innerHeight/ch);
+    stage.style.transform=`scale(${scale})`;
+  }
+  fit();
+  let t;window.addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(fit,50)});
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+})();
+
+/* Slide nav (lifted + simplified from NAFSA) */
+(function(){
+  const track=document.getElementById('track');
+  const slides=Array.from(track.querySelectorAll('.slide'));
+  const total=slides.length;
+  const progressBtns=Array.from(document.querySelectorAll('#progress button'));
+
+  let current=0,isAnimating=false,parallaxProgress=0;
+
+  function applyTransform(){
+    const cw=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--canvas-width'))||1440;
+    const slideOffset=-current*cw;
+    const innerShift=parallaxProgress*cw*0.04;
+    track.style.transform=`translate3d(${slideOffset-innerShift}px, 0, 0)`;
+
+    const active=slides[current];
+    const layers=active.querySelectorAll('.parallax-layer');
+    layers.forEach(l=>{
+      const depth=parseFloat(l.dataset.depth)||.15;
+      const x=-parallaxProgress*depth*200;
+      const y=parallaxProgress*depth*80;
+      const baseT=l.dataset.baseTransform || l.style.transform || '';
+      if(!l.dataset.baseTransform) l.dataset.baseTransform=baseT;
+      l.style.transform=`${l.dataset.baseTransform} translate3d(${x}px, ${y}px, 0)`;
+    });
+  }
+
+  function setActive(idx){
+    current=Math.max(0,Math.min(total-1,idx));
+    parallaxProgress=0;
+    slides.forEach((s,i)=>s.classList.toggle('is-active',i===current));
+    progressBtns.forEach((b,i)=>b.classList.toggle('active',i===current));
+    isAnimating=true;
+    applyTransform();
+    setTimeout(()=>{isAnimating=false},1100);
+  }
+  function next(){if(!isAnimating && current<total-1)setActive(current+1)}
+  function prev(){if(!isAnimating && current>0)setActive(current-1)}
+
+  progressBtns.forEach(b=>b.addEventListener('click',()=>{
+    if(!isAnimating)setActive(parseInt(b.dataset.go,10));
+  }));
+
+  window.addEventListener('keydown',(e)=>{
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '){e.preventDefault();next()}
+    if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev()}
+    if(e.key==='Home'){e.preventDefault();setActive(0)}
+    if(e.key==='End'){e.preventDefault();setActive(total-1)}
+  });
+
+  /* Wheel: parallax build-up then advance */
+  let wheelAccum=0,wheelTimer=null;
+  const ADVANCE_THRESHOLD=220, PARALLAX_DIVISOR=600;
+  window.addEventListener('wheel',(e)=>{
+    if(isAnimating)return;
+    e.preventDefault();
+    const delta=e.deltaY||e.deltaX;
+    wheelAccum+=delta;
+    if(delta>0 && current<total-1){
+      parallaxProgress=Math.min(1,parallaxProgress+Math.abs(delta)/PARALLAX_DIVISOR);
+      applyTransform();
+    } else if(delta<0 && current>0){
+      parallaxProgress=Math.min(1,parallaxProgress+Math.abs(delta)/PARALLAX_DIVISOR);
+      applyTransform();
+    }
+    if(wheelAccum>ADVANCE_THRESHOLD){wheelAccum=0;next()}
+    else if(wheelAccum<-ADVANCE_THRESHOLD){wheelAccum=0;prev()}
+    clearTimeout(wheelTimer);
+    wheelTimer=setTimeout(()=>{wheelAccum=0;parallaxProgress=0;applyTransform()},220);
+  },{passive:false});
+
+  /* Touch swipe */
+  let touchStartX=0,touchActive=false;
+  window.addEventListener('touchstart',(e)=>{
+    if(isAnimating)return;
+    touchStartX=e.touches[0].clientX;touchActive=true;
+  },{passive:true});
+  window.addEventListener('touchend',(e)=>{
+    if(!touchActive)return;
+    touchActive=false;
+    const dx=e.changedTouches[0].clientX-touchStartX;
+    if(Math.abs(dx)>60){if(dx<0)next();else prev()}
+  });
+
+  setActive(0);
+})();
+
+/* About cycling display (lifted from NAFSA) */
+(function(){
+  const display=document.getElementById('aboutCycle');
+  if(!display)return;
+  const slides=Array.from(display.querySelectorAll('.cycle-slide'));
+  const dots=Array.from(display.querySelectorAll('.cd-dot'));
+  if(!slides.length)return;
+
+  let idx=0,timer=null;
+  const INTERVAL=2750;
+  function show(n){
+    idx=(n+slides.length)%slides.length;
+    slides.forEach((s,i)=>s.classList.toggle('is-active',i===idx));
+    dots.forEach((d,i)=>d.classList.toggle('is-active',i===idx));
+  }
+  function start(){stop();timer=setInterval(()=>show(idx+1),INTERVAL)}
+  function stop(){if(timer){clearInterval(timer);timer=null}}
+  dots.forEach((d,i)=>d.addEventListener('click',()=>{show(i);stop();setTimeout(start,8000)}));
+
+  function isActive(){
+    const sec=display.closest('.slide');
+    return sec && sec.classList.contains('is-active');
+  }
+  const sec=display.closest('.slide');
+  if(sec){
+    new MutationObserver(()=>{if(isActive())start();else stop()})
+      .observe(sec,{attributes:true,attributeFilter:['class']});
+  }
+  display.addEventListener('mouseenter',stop);
+  display.addEventListener('mouseleave',()=>{if(isActive())start()});
+  if(isActive())start();
+})();
+
+/* Network map nodes (slide 7) */
+(function(){
+  const hub=document.getElementById('netHub');
+  const conn=document.getElementById('netConn');
+  if(!hub || !conn)return;
+
+  const ICONS={
+    university:'<path d="M3 21h18M5 21V10l7-4 7 4v11M9 21v-7h6v7M3 10l9-5 9 5"/>',
+    users:'<path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>',
+    landmark:'<path d="M3 22h18M5 22V11M19 22V11M9 22v-6h6v6M3 11h18M12 2L3 8h18L12 2z"/>',
+    scale:'<path d="M3 6h18M12 3v18M6 6l-3 7c0 1.66 1.34 3 3 3s3-1.34 3-3l-3-7zM18 6l-3 7c0 1.66 1.34 3 3 3s3-1.34 3-3l-3-7zM7 21h10"/>',
+    industry:'<path d="M2 21V8l5 4V8l5 4V3l5 5h2v13H2z"/>',
+    mic:'<path d="M12 2a3 3 0 00-3 3v6a3 3 0 006 0V5a3 3 0 00-3-3zM19 11a7 7 0 01-14 0M12 18v4M8 22h8"/>',
+    flask:'<path d="M9 2v6L4 18a2 2 0 002 2h12a2 2 0 002-2L15 8V2M8 2h8"/>',
+    cap:'<path d="M22 10L12 5 2 10l10 5 10-5zM6 12v5c0 1 3 3 6 3s6-2 6-3v-5"/>'
+  };
+
+  const nodes=[
+    {ic:'university', l:'10K Universities',     ang:-90},
+    {ic:'users',      l:'Student Unions',       ang:-45},
+    {ic:'landmark',   l:'Embassies',            ang:0},
+    {ic:'scale',      l:'Governments',          ang:45},
+    {ic:'industry',   l:'Industry Leaders',     ang:90},
+    {ic:'mic',        l:'Conference Orgs',      ang:135},
+    {ic:'flask',      l:'Research Bodies',      ang:180},
+    {ic:'cap',        l:'Academic Networks',    ang:-135}
+  ];
+
+  const radius=38; // % of hub
+  let svgInner='';
+  nodes.forEach(n=>{
+    const rad=(n.ang*Math.PI)/180;
+    const cx=50+radius*Math.cos(rad);
+    const cy=50+radius*Math.sin(rad);
+    svgInner+=`<line x1="50" y1="50" x2="${cx}" y2="${cy}" />`;
+
+    const node=document.createElement('div');
+    node.className='network-node';
+    node.style.left=cx+'%';
+    node.style.top=cy+'%';
+    node.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${ICONS[n.ic]}</svg>`;
+
+    const label=document.createElement('span');
+    label.className='nlabel';
+    label.textContent=n.l;
+    const ux=Math.cos(rad), uy=Math.sin(rad);
+    if(Math.abs(ux)<0.3){
+      label.style.left='50%';
+      label.style.transform='translateX(-50%)';
+      if(uy<0){label.style.bottom='calc(100% + 8px)'}
+      else{label.style.top='calc(100% + 8px)'}
+    } else if(ux>0){
+      label.style.left='calc(100% + 10px)';
+      label.style.top='50%';
+      label.style.transform='translateY(-50%)';
+    } else {
+      label.style.right='calc(100% + 10px)';
+      label.style.top='50%';
+      label.style.transform='translateY(-50%)';
+    }
+    node.appendChild(label);
+    hub.appendChild(node);
+  });
+  conn.innerHTML=svgInner;
+})();
+</script>
+
+</body>
+</html>
